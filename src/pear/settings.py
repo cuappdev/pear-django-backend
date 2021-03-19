@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework.authtoken",
+    'person',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +70,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'pear.wsgi.application'
+
+# Needed to test in Postman
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication"
+    ]
+}
+
 
 
 # Database
