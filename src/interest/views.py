@@ -7,6 +7,7 @@ from interest.models import Interest
 from rest_framework import generics
 from rest_framework import status as s
 
+from .controllers.create_interest_controller import CreateInterestController
 from .serializers import InterestSerializer
 
 
@@ -21,21 +22,9 @@ class InterestAllView(generics.GenericAPIView):
 
     def post(self, request):
         """ Create an interest """
-        try:
-            body = json.loads(request.body)
-            name = body.get("name")
-            assert name
-        except:
-            return failure_response("POST body is misformatted", s.HTTP_400_BAD_REQUEST)
-        interest = Interest.objects.filter(name=name)
-        if interest:
-            interest = interest[0]
-            status = s.HTTP_200_OK
-        else:
-            interest = Interest.objects.create(name=name)
-            interest.save()
-            status = s.HTTP_201_CREATED
-        return success_response(self.serializer_class(interest).data, status=status)
+        return CreateInterestController(
+            request=request, serializer=self.serializer_class
+        ).process()
 
     def delete(self, request):
         """ Delete an interest """
