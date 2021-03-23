@@ -1,16 +1,16 @@
-from django.shortcuts import render
 import json
 
 from api import settings as api_settings
 from api.utils import success_response
 from django.contrib.auth.models import User
-from django.db.models import Q
 from rest_framework import generics
 
 from .controllers.authenticate_controller import AuthenticateController
+from .controllers.update_person_controller import UpdatePersonController
 from .serializers import AuthenticateSerializer
+from .serializers import UserSerializer
 
-# Create your views here.
+
 class AuthenticateView(generics.GenericAPIView):
     serializer_class = AuthenticateSerializer
     permission_classes = api_settings.UNPROTECTED
@@ -21,3 +21,21 @@ class AuthenticateView(generics.GenericAPIView):
         except json.JSONDecodeError:
             data = request.data
         return AuthenticateController(request, data, self.serializer_class).process()
+
+
+class MeView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def get(self, request):
+        """Get current authenticated user."""
+        user = User.objects.get(id=request.user.id)
+        return success_response(self.serializer_class(user).data)
+
+    def post(self, request):
+        """Update current authenticated user."""
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            data = request.data
+        return UpdatePersonController(request, data, self.serializer_class).process()
