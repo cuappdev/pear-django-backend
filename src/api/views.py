@@ -3,8 +3,9 @@ import json
 from api.utils import failure_response
 from api.utils import success_response
 from interest.controllers.create_interest_controller import CreateInterestController
+from pear import settings as pear_settings
 from rest_framework import generics
-from rest_framework import status as s
+from rest_framework import status
 
 from . import settings as api_settings
 
@@ -17,43 +18,44 @@ class PopulateView(generics.GenericAPIView):
         to be created into a new entry if not already in the database.
         Returns the number of newly created data entries."""
         newEntries = 0
-        with open(f"{api_settings.ASSETS_LOCATION}{filename}") as file:
+        with open(f"{pear_settings.ASSETS_LOCATION}{filename}") as file:
             for line in file:
-                line = line.strip().split(api_settings.ASSETS_SPLITTER)
+                line = line.strip().split(pear_settings.ASSETS_SPLITTER)
                 newEntries += 1 if controller(data=line).process() else 0
         return newEntries
 
     def _filename_switch(self, filename):
-        """ Returns the appropriate controller class for `filename`"""
+        """Returns the appropriate controller class for `filename`."""
         switch = {
-            "PearGroups.txt": None,  # TODO
-            "PearInterests.txt": CreateInterestController,
-            "PearLocations.txt": None,  # TODO
+            "pear_groups.txt": None,  # TODO
+            "pear_interests.txt": CreateInterestController,
+            "pear_locations.txt": None,  # TODO
         }
         return switch.get(filename, None)
 
     def post(self, request):
-        """ Populates the database with the hardcoded data from the filenames in `request.body` """
-        try:
-            body = json.loads(request.body)
-            filenames = body.get("filenames")
-            assert filenames
-        except:
-            return failure_response("POST body is misformatted", s.HTTP_400_BAD_REQUEST)
+        """Populates the database with the hardcoded data from the filenames in `request.body`."""
+        body = json.loads(request.body)
+        filenames = body.get("filenames")
+        if filenames is None:
+            return failure_response(
+                "POST body is misformatted", status.HTTP_400_BAD_REQUEST
+            )
 
-        newEntries = 0
+        new_entries = 0
         for filename in filenames:
             controller = self._filename_switch(filename)
             if controller:
-                newEntries += self._parse_and_create(filename, controller)
+                new_entries += self._parse_and_create(filename, controller)
             else:
                 return failure_response(
-                    f"Invalid filename {filename}", s.HTTP_406_NOT_ACCEPTABLE
+                    f"Invalid filename {filename}", status.HTTP_406_NOT_ACCEPTABLE
                 )
 
-        if newEntries > 0:
+        if new_entries > 0:
             return success_response(
-                f"Successfully created {newEntries} new entries", s.HTTP_201_CREATED
+                f"Successfully created {new_entries} new entries",
+                status.HTTP_201_CREATED,
             )
         else:
-            return success_response("No new changes", s.HTTP_200_OK)
+            return success_response("No new changes", status.HTTP_200_OK)
