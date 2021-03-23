@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
-# Create your models here.
 class Person(models.Model):
     id_token = models.TextField(null=True)
     net_id = models.CharField(max_length=10)

@@ -20,7 +20,6 @@ class AuthenticateSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField()
     net_id = serializers.CharField(source="person.net_id")
     hometown = serializers.CharField(source="person.hometown")
     profile_pic_url = serializers.CharField(source="person.profile_pic_url")

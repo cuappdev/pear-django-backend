@@ -2,7 +2,6 @@ import json
 
 from api import settings as api_settings
 from api.utils import success_response
-from django.contrib.auth.models import User
 from rest_framework import generics
 
 from .controllers.authenticate_controller import AuthenticateController
@@ -29,8 +28,7 @@ class MeView(generics.GenericAPIView):
 
     def get(self, request):
         """Get current authenticated user."""
-        user = User.objects.get(id=request.user.id)
-        return success_response(self.serializer_class(user).data)
+        return success_response(self.serializer_class(request.user).data)
 
     def post(self, request):
         """Update current authenticated user."""
