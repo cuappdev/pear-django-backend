@@ -21,34 +21,30 @@ class UpdatePersonController:
         graduation_year = self._data.get("graduation_year")
         pronouns = self._data.get("pronouns")
 
-        if net_id is not None and self._person.net_id != net_id:
-            self._person.net_id = net_id
-        if first_name is not None and self._user.first_name != first_name:
-            self._user.first_name = first_name
-        if last_name is not None and self._user.last_name != last_name:
-            self._user.last_name = last_name
-        if hometown is not None and self._person.hometown != hometown:
-            self._person.hometown = hometown
-        if (
-            profile_pic_url is not None
-            and self._person.profile_pic_url != profile_pic_url
-        ):
-            self._person.profile_pic_url = profile_pic_url
-        if facebook_url is not None and self._person.facebook_url != facebook_url:
-            self._person.facebook_url = facebook_url
-        if (
-            instagram_username is not None
-            and self._person.instagram_username != instagram_username
-        ):
-            self._person.instagram_username = instagram_username
-        if (
-            graduation_year is not None
-            and self._person.graduation_year != graduation_year
-        ):
-            self._person.graduation_year = graduation_year
-        if pronouns is not None and self._person.pronouns != pronouns:
-            self._person.pronouns = pronouns
-
+        self._person.net_id = self._get_value(net_id, self._person.net_id)
+        self._user.first_name = self._get_value(first_name, self._user.first_name)
+        self._user.last_name = self._get_value(last_name, self._user.last_name)
+        self._person.hometown = self._get_value(hometown, self._person.hometown)
+        self._person.profile_pic_url = self._get_value(
+            profile_pic_url, self._person.profile_pic_url
+        )
+        self._person.facebook_url = self._get_value(
+            facebook_url, self._person.facebook_url
+        )
+        self._person.instagram_username = self._get_value(
+            instagram_username, self._person.instagram_username
+        )
+        self._person.graduation_year = self._get_value(
+            graduation_year, self._person.graduation_year
+        )
+        self._person.pronouns = self._get_value(pronouns, self._person.pronouns)
         self._user.save()
         self._person.save()
         return success_response(self._serializer(self._user).data)
+
+    def _get_value(self, v, default):
+        """Get value, or get default if value is None."""
+        if v is None:
+            return default
+        else:
+            return v
