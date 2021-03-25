@@ -2,8 +2,6 @@ import time
 
 from celery import shared_task
 
-count = 0
-
 
 @shared_task
 def start_countdown(seconds):
