@@ -8,6 +8,7 @@ from rest_framework import generics
 from rest_framework import status
 
 from . import settings as api_settings
+from .tasks import start_countdown
 
 
 class PopulateView(generics.GenericAPIView):
@@ -59,3 +60,15 @@ class PopulateView(generics.GenericAPIView):
             )
         else:
             return success_response("No new changes", status.HTTP_200_OK)
+
+
+class CountdownDummyView(generics.GenericAPIView):
+    def post(self, request):
+        body = json.loads(request.body)
+        seconds = body.get("seconds")
+        if seconds:
+            start_countdown.delay(seconds)
+            return success_response(f"Countdown started for {seconds} seconds")
+        return failure_response(
+            "POST body is misformatted", status.HTTP_400_BAD_REQUEST
+        )
