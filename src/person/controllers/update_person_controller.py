@@ -34,7 +34,7 @@ class UpdatePersonController:
                 )
             else:
                 return failure_response(
-                    f"Unable to upload image to AppDev Upload service:{upload_response.status_code}",
+                    "Unable to upload image to AppDev Upload service",
                     status.HTTP_503_SERVICE_UNAVAILABLE,
                 )
 
