@@ -14,5 +14,3 @@ UNPROTECTED = [AllowAny]
 
 AUTH_PASSWORD_SALT = "LtC66ubP"
 ACCESS_TOKEN_AGE = 60 * 15  # 15 minutes
-
-UPLOAD_URL = "https://upload.cornellappdev.com/upload/"

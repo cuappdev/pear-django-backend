@@ -54,9 +54,3 @@ class UpdatePersonController:
             return default
         else:
             return v
-
-    # def _upload_profile_pic(self, profile_pic_base64):
-    #     """Uploads image to AppDev Upload service, and modifies Person's profile_pic_url if successful. Returns the HTTP Response."""
-    #     request_body = {"bucket": "pear", "image": profile_pic_base64}
-    #     response = requests.post(api_settings.UPLOAD_URL, json=request_body)
-    #     return response
