@@ -1,5 +1,7 @@
 from api.utils import success_response
 
+from ..tasks import upload_profile_pic
+
 
 class UpdatePersonController:
     def __init__(self, request, data, serializer):
@@ -15,11 +17,15 @@ class UpdatePersonController:
         first_name = self._data.get("first_name")
         last_name = self._data.get("last_name")
         hometown = self._data.get("hometown")
+        profile_pic_base64 = self._data.get("profile_pic_base64")
         profile_pic_url = self._data.get("profile_pic_url")
         facebook_url = self._data.get("facebook_url")
         instagram_username = self._data.get("instagram_username")
         graduation_year = self._data.get("graduation_year")
         pronouns = self._data.get("pronouns")
+
+        if profile_pic_base64 is not None:
+            upload_profile_pic.delay(self._user.id, profile_pic_base64)
 
         self._person.net_id = self._get_value(net_id, self._person.net_id)
         self._user.first_name = self._get_value(first_name, self._user.first_name)
@@ -40,7 +46,7 @@ class UpdatePersonController:
         self._person.pronouns = self._get_value(pronouns, self._person.pronouns)
         self._user.save()
         self._person.save()
-        return success_response(self._serializer(self._user).data)
+        return success_response()
 
     def _get_value(self, v, default):
         """Get value, or get default if value is None."""
