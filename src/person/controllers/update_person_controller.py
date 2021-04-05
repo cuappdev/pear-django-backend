@@ -1,8 +1,6 @@
-from api import settings as api_settings
-from api.utils import failure_response
 from api.utils import success_response
-import requests
-from rest_framework import status
+
+from ..tasks import upload_profile_pic
 
 
 class UpdatePersonController:
@@ -27,16 +25,7 @@ class UpdatePersonController:
         pronouns = self._data.get("pronouns")
 
         if profile_pic_base64 is not None:
-            upload_response = self._upload_profile_pic(profile_pic_base64)
-            if upload_response:
-                self._person.profile_pic_url = self._get_value(
-                    upload_response.json().get("data"), self._person.profile_pic_url
-                )
-            else:
-                return failure_response(
-                    "Unable to upload image to AppDev Upload service",
-                    status.HTTP_503_SERVICE_UNAVAILABLE,
-                )
+            upload_profile_pic.delay(self._user.id, profile_pic_base64)
 
         self._person.net_id = self._get_value(net_id, self._person.net_id)
         self._user.first_name = self._get_value(first_name, self._user.first_name)
@@ -57,7 +46,7 @@ class UpdatePersonController:
         self._person.pronouns = self._get_value(pronouns, self._person.pronouns)
         self._user.save()
         self._person.save()
-        return success_response(self._serializer(self._user).data)
+        return success_response()
 
     def _get_value(self, v, default):
         """Get value, or get default if value is None."""
@@ -66,8 +55,8 @@ class UpdatePersonController:
         else:
             return v
 
-    def _upload_profile_pic(self, profile_pic_base64):
-        """Uploads image to AppDev Upload service, and modifies Person's profile_pic_url if successful. Returns the HTTP Response."""
-        request_body = {"bucket": "pear", "image": profile_pic_base64}
-        response = requests.post(api_settings.UPLOAD_URL, json=request_body)
-        return response
+    # def _upload_profile_pic(self, profile_pic_base64):
+    #     """Uploads image to AppDev Upload service, and modifies Person's profile_pic_url if successful. Returns the HTTP Response."""
+    #     request_body = {"bucket": "pear", "image": profile_pic_base64}
+    #     response = requests.post(api_settings.UPLOAD_URL, json=request_body)
+    #     return response
