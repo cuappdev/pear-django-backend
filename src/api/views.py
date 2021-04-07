@@ -31,7 +31,7 @@ class PopulateView(generics.GenericAPIView):
         switch = {
             "pear_groups.txt": None,  # TODO
             "pear_interests.txt": CreateInterestController,
-            "pear_locations.txt": CreateLocationController,  # TODO
+            "pear_locations.txt": CreateLocationController,
         }
         return switch.get(filename, None)
 
