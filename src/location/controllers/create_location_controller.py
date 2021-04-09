@@ -28,7 +28,6 @@ class CreateLocationController:
             return failure_response(
                 "POST body is misformatted", status.HTTP_400_BAD_REQUEST
             )
-
         location = Location.objects.filter(name=name, area=area)
         if location:
             return success_response(

@@ -14,7 +14,9 @@ urlpatterns = [
     path("interests/", InterestsView.as_view(), name="interests"),
     path("locations/", LocationsView.as_view(), name="locations"),
     path(
-        "locations/<int:location_id>/", SingleLocationView.as_view(), name="locations"
+        "locations/<int:location_id>/",
+        SingleLocationView.as_view(),
+        name="location-single",
     ),
     path("populate/", PopulateView.as_view(), name="populate"),
     path("countdown/", CountdownDummyView.as_view(), name="countdown"),

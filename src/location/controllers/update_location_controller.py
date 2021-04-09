@@ -26,11 +26,9 @@ class UpdateLocationController:
         location = Location.objects.filter(id=self._location_id)
         if not location:
             return failure_response("Location does not exist")
-
         if name is not None and location[0].name != name:
             location[0].name = name
         if area is not None and location[0].area != area:
             location[0].area = area
-
         location[0].save()
         return success_response(self._serializer(location[0]).data, status.HTTP_200_OK)
