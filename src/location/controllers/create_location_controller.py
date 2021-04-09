@@ -7,13 +7,14 @@ from rest_framework import status
 
 
 class CreateLocationController:
-    def __init__(self, request=None, serializer=None, data=None):
+    def __init__(self, request, data, serializer):
         self._request = request
         self._serializer = serializer
         self._data = data
 
-    def _process_request(self):
-        """The possible status code cases for a processed request include
+    def process(self):
+        """Process a request to create a location.
+        The possible status code cases for a processed request include
         - 200 if the request body describes an existing Location
           - Returns the existing Location
         - 201 if the request body describes a new Location or updates the area for a Location
@@ -27,42 +28,15 @@ class CreateLocationController:
             return failure_response(
                 "POST body is misformatted", status.HTTP_400_BAD_REQUEST
             )
-        location = Location.objects.filter(name=name)
-        if location and location[0].area != area:
-            location[0].area = area
-            location[0].save()
+
+        location = Location.objects.filter(name=name, area=area)
+        if location:
             return success_response(
-                self._serializer(location[0]).data, status.HTTP_201_CREATED
+                self._serializer(location[0]).data, status.HTTP_200_OK
             )
-        elif location:
-            location = location[0]
-            return success_response(self._serializer(location).data, status.HTTP_200_OK)
         else:
             location = Location.objects.create(name=name, area=area)
             location.save()
             return success_response(
                 self._serializer(location).data, status.HTTP_201_CREATED
             )
-
-    def _process_data(self):
-        """Returns True after creating a Location if the datum in the
-        data describes a unique Location"""
-        name = self._data[1]
-        area = self._data[0]
-        location = Location.objects.filter(name=name)
-        if location and location[0].area != area:
-            location[0].area = area
-            location[0].save()
-            return True
-        elif location:
-            return False
-        else:
-            location = Location.objects.create(name=name, area=area)
-            location.save()
-            return True
-
-    def process(self):
-        if self._request:
-            return self._process_request()
-        elif self._data:
-            return self._process_data()

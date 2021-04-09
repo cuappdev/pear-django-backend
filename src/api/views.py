@@ -3,7 +3,7 @@ import json
 from api.utils import failure_response
 from api.utils import success_response
 from interest.controllers.create_interest_controller import CreateInterestController
-from location.controllers.create_location_controller import CreateLocationController
+from location.controllers.populate_location_controller import PopulateLocationController
 from pear import settings as pear_settings
 from rest_framework import generics
 from rest_framework import status
@@ -31,7 +31,7 @@ class PopulateView(generics.GenericAPIView):
         switch = {
             "pear_groups.txt": None,  # TODO
             "pear_interests.txt": CreateInterestController,
-            "pear_locations.txt": CreateLocationController,
+            "pear_locations.txt": PopulateLocationController,
         }
         return switch.get(filename, None)
 
