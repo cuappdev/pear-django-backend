@@ -89,8 +89,8 @@ class AuthenticateController:
             self._request, username=username, password=password
         )
         if authenticated_user is None:
-            # User ID from token retrieved with id_token doesn't correspond to netID
-            # Could result from debugging mistake or malicious activity..
+            # Google User ID doesn't correspond to net_id
+            # Could result from debugging mistake or malicious activity...
             return None, status.HTTP_403_FORBIDDEN
         login(self._request, authenticated_user)
         return (
