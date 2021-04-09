@@ -1,3 +1,5 @@
+import os
+
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.permissions import IsAuthenticated
@@ -12,5 +14,5 @@ CONSUMER_PERMISSIONS = [IsAuthenticated]
 
 UNPROTECTED = [AllowAny]
 
-AUTH_PASSWORD_SALT = "LtC66ubP"
+AUTH_PASSWORD_SALT = os.getenv("AUTH_PASSWORD_SALT")
 ACCESS_TOKEN_AGE = 60 * 15  # 15 minutes
