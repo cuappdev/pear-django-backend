@@ -13,7 +13,7 @@ urlpatterns = [
     path("me/", MeView.as_view(), name="me"),
     path("interests/", InterestsView.as_view(), name="interests"),
     path("locations/", LocationsView.as_view(), name="locations"),
-    path("locations/<int:loc_id>/", LocationView.as_view(), name="location"),
+    path("locations/<int:id>/", LocationView.as_view(), name="location"),
     path("populate/", PopulateView.as_view(), name="populate"),
     path("countdown/", CountdownDummyView.as_view(), name="countdown"),
 ]
