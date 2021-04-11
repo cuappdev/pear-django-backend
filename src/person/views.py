@@ -15,6 +15,7 @@ class AuthenticateView(generics.GenericAPIView):
     permission_classes = api_settings.UNPROTECTED
 
     def post(self, request):
+        """Authenticate the current user."""
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
