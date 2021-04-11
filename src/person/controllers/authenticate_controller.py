@@ -4,7 +4,7 @@ from api import settings as api_settings
 from api.utils import failure_response
 from api.utils import success_response
 from django.contrib.auth import authenticate
-from django.contrib.auth import login
+from django.contrib.auth import login as django_login
 from django.contrib.auth.models import User
 from django.utils import timezone
 from google.auth.transport import requests
@@ -62,29 +62,29 @@ class AuthenticateController:
     def process(self):
         """Returns the current access token or a new one if expired. If the user isn't authenticated yet,
         logs an existing user in or registers a new one."""
-        current_user = self._request.user
+        user = self._request.user
         status_code = status.HTTP_200_OK
-        if not current_user.is_authenticated:
+        if not user.is_authenticated:
             token = self._data.get("id_token")
             token_info = self._get_token_info(token)
             if token_info is None:
                 return failure_response("ID Token is not valid.")
-            current_user, status_code = self.login(token_info)
-            if current_user is None:
+            user, status_code = self._login(token_info)
+            if user is None:
                 return failure_response("ID Token is not valid.", status=status_code)
-        access_token = self._issue_access_token(current_user)
+        access_token = self._issue_access_token(user)
         return success_response(
-            self._serializer(current_user, context={"access_token": access_token}).data,
+            self._serializer(user, context={"access_token": access_token}).data,
             status=status_code,
         )
 
-    def login(self, token_info):
+    def _login(self, token_info):
         """Returns the authenticated user (if no issues) and status code depending on
         whether a new user registered."""
         net_id, username, password, _, _, _ = self._prepare_token_info(token_info)
         person_exists = Person.objects.filter(net_id=net_id)
         if not person_exists:
-            self.register(token_info)
+            self._register(token_info)
         authenticated_user = authenticate(
             self._request, username=username, password=password
         )
@@ -92,13 +92,13 @@ class AuthenticateController:
             # Google User ID doesn't correspond to net_id
             # Could result from debugging mistake or malicious activity...
             return None, status.HTTP_403_FORBIDDEN
-        login(self._request, authenticated_user)
+        django_login(self._request, authenticated_user)
         return (
             authenticated_user,
             status.HTTP_201_CREATED if not person_exists else status.HTTP_200_OK,
         )
 
-    def register(self, token_info):
+    def _register(self, token_info):
         """Creates and associates a User and Person object."""
         (
             net_id,
