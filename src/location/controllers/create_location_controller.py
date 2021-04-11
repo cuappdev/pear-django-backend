@@ -33,9 +33,8 @@ class CreateLocationController:
             return success_response(
                 self._serializer(location[0]).data, status.HTTP_200_OK
             )
-        else:
-            location = Location.objects.create(name=name, area=area)
-            location.save()
-            return success_response(
-                self._serializer(location).data, status.HTTP_201_CREATED
-            )
+        location = Location.objects.create(name=name, area=area)
+        location.save()
+        return success_response(
+            self._serializer(location).data, status.HTTP_201_CREATED
+        )
