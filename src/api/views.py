@@ -2,6 +2,7 @@ import json
 
 from api.utils import failure_response
 from api.utils import success_response
+from group.controllers.populate_group_controller import PopulateGroupController
 from interest.controllers.create_interest_controller import CreateInterestController
 from location.controllers.populate_location_controller import PopulateLocationController
 from pear import settings as pear_settings
@@ -29,7 +30,7 @@ class PopulateView(generics.GenericAPIView):
     def _filename_switch(self, filename):
         """Returns the appropriate controller class for `filename`."""
         switch = {
-            "pear_groups.txt": None,  # TODO
+            "pear_groups.txt": PopulateGroupController,
             "pear_interests.txt": CreateInterestController,
             "pear_locations.txt": PopulateLocationController,
         }
