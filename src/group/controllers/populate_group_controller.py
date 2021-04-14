@@ -11,7 +11,6 @@ class PopulateGroupController:
         group = Group.objects.filter(name=self._name)
         if group:
             return False
-        else:
-            new_group = Group.objects.create(name=self._name)
-            new_group.save()
-            return True
+        new_group = Group.objects.create(name=self._name)
+        new_group.save()
+        return True
