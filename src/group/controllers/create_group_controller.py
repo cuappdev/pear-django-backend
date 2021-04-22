@@ -1,5 +1,3 @@
-import json
-
 from api.utils import failure_response
 from api.utils import success_response
 from group.models import Group
@@ -7,29 +5,30 @@ from rest_framework import status
 
 
 class CreateGroupController:
-    def __init__(self, request, data, serializer):
-        self._request = request
-        self._serializer = serializer
+    def __init__(self, data, serializer):
         self._data = data
+        self._serializer = serializer
 
     def process(self):
-        """Process a request to create a group.
-        The possible status code cases for a processed request include
-        - 200 if the request body describes an existing Group
-          - Returns the existing Group
-        - 201 if the request body describes a new Group or updates the area for a Group
-          - Creates and then returns the new (or existing) Group
-        - 400 if the POST body is misformatted
-          - Returns an error message"""
-        self._body = json.loads(self._request.body)
-        name = self._body.get("name")
+        """Process a request to create a group."""
+
+        # Verify that all required fields are provided
+        name = self._data.get("name")
         if name is None:
             return failure_response(
                 "POST body is misformatted", status.HTTP_400_BAD_REQUEST
             )
-        group = Group.objects.filter(name=name)
+
+        # Get optional fields
+        subtitle = self._data.get("subtitle")
+        img_url = self._data.get("img_url")
+
+        # Check if a group already exists with the given fields and return it if so
+        group = Group.objects.filter(name=name, subtitle=subtitle, img_url=img_url)
         if group:
             return success_response(self._serializer(group[0]).data, status.HTTP_200_OK)
-        group = Group.objects.create(name=name)
+
+        # Create and return a new group with the given fields
+        group = Group.objects.create(name=name, subtitle=subtitle, img_url=img_url)
         group.save()
         return success_response(self._serializer(group).data, status.HTTP_201_CREATED)

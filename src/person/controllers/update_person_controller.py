@@ -1,4 +1,6 @@
+from api.utils import modify_attribute
 from api.utils import success_response
+from rest_framework import status
 
 from ..tasks import upload_profile_pic
 
@@ -26,19 +28,14 @@ class UpdatePersonController:
         if profile_pic_base64 is not None:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)
 
-        self._modify_attribute(self._person, "net_id", net_id)
-        self._modify_attribute(self._user, "first_name", first_name)
-        self._modify_attribute(self._user, "last_name", last_name)
-        self._modify_attribute(self._person, "hometown", hometown)
-        self._modify_attribute(self._person, "facebook_url", facebook_url)
-        self._modify_attribute(self._person, "instagram_username", instagram_username)
-        self._modify_attribute(self._person, "graduation_year", graduation_year)
-        self._modify_attribute(self._person, "pronouns", pronouns)
+        modify_attribute(self._person, "net_id", net_id)
+        modify_attribute(self._user, "first_name", first_name)
+        modify_attribute(self._user, "last_name", last_name)
+        modify_attribute(self._person, "hometown", hometown)
+        modify_attribute(self._person, "facebook_url", facebook_url)
+        modify_attribute(self._person, "instagram_username", instagram_username)
+        modify_attribute(self._person, "graduation_year", graduation_year)
+        modify_attribute(self._person, "pronouns", pronouns)
         self._user.save()
         self._person.save()
-        return success_response()
-
-    def _modify_attribute(self, model, attr_name, attr_value):
-        """Modify an attribute if it isn't None and has been changed."""
-        if attr_value is not None and attr_value != getattr(model, attr_name):
-            setattr(model, attr_name, attr_value)
+        return success_response(status=status.HTTP_200_OK)

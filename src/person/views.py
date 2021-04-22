@@ -3,6 +3,7 @@ import json
 from api import settings as api_settings
 from api.utils import success_response
 from rest_framework import generics
+from rest_framework import status
 
 from .controllers.authenticate_controller import AuthenticateController
 from .controllers.update_person_controller import UpdatePersonController
@@ -29,7 +30,9 @@ class MeView(generics.GenericAPIView):
 
     def get(self, request):
         """Get current authenticated user."""
-        return success_response(self.serializer_class(request.user).data)
+        return success_response(
+            self.serializer_class(request.user).data, status.HTTP_200_OK
+        )
 
     def post(self, request):
         """Update current authenticated user."""

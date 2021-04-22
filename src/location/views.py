@@ -5,6 +5,7 @@ from api.utils import failure_response
 from api.utils import success_response
 from location.models import Location
 from rest_framework import generics
+from rest_framework import status
 
 from .controllers.create_location_controller import CreateLocationController
 from .controllers.update_location_controller import UpdateLocationController
@@ -18,7 +19,9 @@ class LocationsView(generics.GenericAPIView):
     def get(self, request):
         """Get all locations."""
         locations = Location.objects.all()
-        return success_response(self.serializer_class(locations, many=True).data)
+        return success_response(
+            self.serializer_class(locations, many=True).data, status.HTTP_200_OK
+        )
 
     def post(self, request):
         """Create a location."""
@@ -26,7 +29,7 @@ class LocationsView(generics.GenericAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             data = request.data
-        return CreateLocationController(request, data, self.serializer_class).process()
+        return CreateLocationController(data, self.serializer_class).process()
 
 
 class LocationView(generics.GenericAPIView):
@@ -36,9 +39,13 @@ class LocationView(generics.GenericAPIView):
     def get(self, request, id):
         """Get location by id."""
         location = Location.objects.filter(id=id)
-        if location:
-            return success_response(self.serializer_class(location[0]).data)
-        return failure_response("Location does not exist")
+        if not location:
+            return failure_response(
+                "Location does not exist", status.HTTP_404_NOT_FOUND
+            )
+        return success_response(
+            self.serializer_class(location[0]).data, status.HTTP_200_OK
+        )
 
     def post(self, request, id):
         """Update location by id."""
@@ -46,14 +53,16 @@ class LocationView(generics.GenericAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             data = request.data
-        return UpdateLocationController(
-            id, request, data, self.serializer_class
-        ).process()
+        return UpdateLocationController(id, data, self.serializer_class).process()
 
     def delete(self, request, id):
         """Delete a location by id."""
         location = Location.objects.filter(id=id)
-        if location:
-            location[0].delete()
-            return success_response(self.serializer_class(location[0]).data)
-        return failure_response("Location does not exist")
+        if not location:
+            return failure_response(
+                "Location does not exist", status.HTTP_404_NOT_FOUND
+            )
+        location[0].delete()
+        return success_response(
+            self.serializer_class(location[0]).data, status.HTTP_200_OK
+        )
