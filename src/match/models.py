@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
-from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 from location.models import Location
+from match.validators import validate_int_list
+from match.validators import validate_times_list
 
 
 class Match(models.Model):
@@ -16,10 +17,12 @@ class Match(models.Model):
     accepted_ids = models.CharField(
         default=None,
         null=True,
-        validators=[validate_comma_separated_integer_list],
+        validators=[validate_int_list],
         max_length=10,
     )
-    proposed_meeting_times = models.TextField(default=None, null=True)
+    proposed_meeting_times = models.TextField(
+        default="[]", null=True, validators=[validate_times_list]
+    )
     proposed_locations = models.ManyToManyField(
         Location, default=None, related_name="+"
     )
@@ -27,3 +30,4 @@ class Match(models.Model):
         Location, default=None, null=True, on_delete=models.SET_NULL, related_name="+"
     )
     meeting_time = models.CharField(max_length=40, default=None, null=True)
+    created_date = models.DateTimeField(auto_now_add=True, null=True)
