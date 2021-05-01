@@ -3,7 +3,7 @@ import json
 from api.utils import failure_response
 from api.utils import success_response
 from group.controllers.populate_group_controller import PopulateGroupController
-from interest.controllers.create_interest_controller import CreateInterestController
+from interest.controllers.populate_interest_controller import PopulateInterestController
 from location.controllers.populate_location_controller import PopulateLocationController
 from pear import settings as pear_settings
 from rest_framework import generics
@@ -31,7 +31,7 @@ class PopulateView(generics.GenericAPIView):
         """Returns the appropriate controller class for `filename`."""
         switch = {
             "pear_groups.txt": PopulateGroupController,
-            "pear_interests.txt": CreateInterestController,
+            "pear_interests.txt": PopulateInterestController,
             "pear_locations.txt": PopulateLocationController,
         }
         return switch.get(filename, None)
@@ -70,7 +70,9 @@ class CountdownDummyView(generics.GenericAPIView):
         seconds = body.get("seconds")
         if seconds:
             start_countdown.delay(seconds)
-            return success_response(f"Countdown started for {seconds} seconds")
+            return success_response(
+                f"Countdown started for {seconds} seconds", status.HTTP_200_OK
+            )
         return failure_response(
             "POST body is misformatted", status.HTTP_400_BAD_REQUEST
         )

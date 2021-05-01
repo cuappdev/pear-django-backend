@@ -8,6 +8,7 @@ from rest_framework import generics
 from rest_framework import status
 
 from .controllers.create_interest_controller import CreateInterestController
+from .controllers.update_interest_controller import UpdateInterestController
 from .serializers import InterestSerializer
 
 
@@ -18,25 +19,50 @@ class InterestsView(generics.GenericAPIView):
     def get(self, request):
         """Get all interests."""
         interests = Interest.objects.all()
-        return success_response(self.serializer_class(interests, many=True).data)
+        return success_response(
+            self.serializer_class(interests, many=True).data, status.HTTP_200_OK
+        )
 
     def post(self, request):
         """Create an interest."""
-        return CreateInterestController(
-            request=request, serializer=self.serializer_class
-        ).process()
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            data = request.data
+        return CreateInterestController(data, self.serializer_class).process()
 
-    def delete(self, request):
-        """Delete an interest."""
-        body = json.loads(request.body)
-        name = body.get("name")
-        if name is None:
+
+class InterestView(generics.GenericAPIView):
+    serializer_class = InterestSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def get(self, request, id):
+        """Get interest by id."""
+        interest = Interest.objects.filter(id=id)
+        if not interest:
             return failure_response(
-                "POST body is misformatted", status.HTTP_400_BAD_REQUEST
+                "Interest does not exist", status.HTTP_404_NOT_FOUND
             )
-        interest = Interest.objects.filter(name=name)
-        if interest:
-            interest[0].delete()
-        else:
-            return failure_response("Provided interest does not exist")
-        return success_response(self.serializer_class(interest[0]).data)
+        return success_response(
+            self.serializer_class(interest[0]).data, status.HTTP_200_OK
+        )
+
+    def post(self, request, id):
+        """Update interest by id."""
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            data = request.data
+        return UpdateInterestController(id, data, self.serializer_class).process()
+
+    def delete(self, request, id):
+        """Delete an interest by id."""
+        interest = Interest.objects.filter(id=id)
+        if not interest:
+            return failure_response(
+                "Interest does not exist", status.HTTP_404_NOT_FOUND
+            )
+        interest[0].delete()
+        return success_response(
+            self.serializer_class(interest[0]).data, status.HTTP_200_OK
+        )

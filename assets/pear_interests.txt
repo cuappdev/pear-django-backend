@@ -1,15 +1,15 @@
-Art
-Business
-Dance
-Design
-Fashion
-Fitness
-Food
-Humanities
-Music
-Photography
-Reading
-Sustainability
-Tech
-Travel
-TV & Film
+Art|painting, crafts, embroidery|
+Business|entrepreneurship, finance, VC|
+Dance|urban, hip hop, ballet, swing|
+Design|UI/UX, graphic, print|
+Fashion||
+Fitness|working out, outdoors, basketball|
+Food|cooking, eating, baking|
+Humanities|history, politics|
+Music|instruments, producing, acapella|
+Photography|digital, analog|
+Reading||
+Sustainability||
+Tech|programming, web/app development|
+Travel|road, trips, backpacking|
+TV & Film||

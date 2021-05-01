@@ -4,6 +4,7 @@ from django.urls import path
 from group.views import GroupsView
 from group.views import GroupView
 from interest.views import InterestsView
+from interest.views import InterestView
 from location.views import LocationsView
 from location.views import LocationView
 from person.views import AuthenticateView
@@ -14,6 +15,7 @@ urlpatterns = [
     path("authenticate/", AuthenticateView.as_view(), name="authenticate"),
     path("me/", MeView.as_view(), name="me"),
     path("interests/", InterestsView.as_view(), name="interests"),
+    path("interests/<int:id>/", InterestView.as_view(), name="interest"),
     path("groups/", GroupsView.as_view(), name="groups"),
     path("groups/<int:id>/", GroupView.as_view(), name="group"),
     path("locations/", LocationsView.as_view(), name="locations"),
