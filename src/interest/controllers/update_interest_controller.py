@@ -12,8 +12,6 @@ class UpdateInterestController:
         self._serializer = serializer
 
     def process(self):
-        """Process a request to update an interest's fields that have changed."""
-
         # Get the model
         interest = Interest.objects.filter(id=self._id)
         if interest is None:

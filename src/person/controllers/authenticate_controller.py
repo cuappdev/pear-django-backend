@@ -69,7 +69,7 @@ class AuthenticateController:
             token_info = self._get_token_info(token)
             if token_info is None:
                 return failure_response(
-                    "ID Token is not valid.", status.HTTP_404_NOT_FOUND
+                    "ID Token is not valid.", status.HTTP_401_UNAUTHORIZED
                 )
             user, status_code = self._login(token_info)
             if user is None:

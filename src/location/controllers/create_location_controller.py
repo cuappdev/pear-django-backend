@@ -10,8 +10,6 @@ class CreateLocationController:
         self._serializer = serializer
 
     def process(self):
-        """Process a request to create a location."""
-
         # Verify that all required fields are provided
         name = self._data.get("name")
         area = self._data.get("area")

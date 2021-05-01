@@ -8,10 +8,6 @@ class PopulateInterestController:
         self._img_url = data[2]
 
     def process(self):
-        """Process a request to populate the database with interest
-        data. Returns True for newly created unique interests and
-        False if a interest with the given data exists already."""
-
         # Check if a interest already exists with the given fields and return False if so
         interest = Interest.objects.filter(
             name=self._name, subtitle=self._subtitle, img_url=self._img_url

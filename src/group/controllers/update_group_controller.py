@@ -12,8 +12,6 @@ class UpdateGroupController:
         self._serializer = serializer
 
     def process(self):
-        """Process a request to update a group's fields that have changed."""
-
         # Get the model
         group = Group.objects.filter(id=self._id)
         if group is None:

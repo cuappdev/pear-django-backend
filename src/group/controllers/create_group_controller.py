@@ -10,8 +10,6 @@ class CreateGroupController:
         self._serializer = serializer
 
     def process(self):
-        """Process a request to create a group."""
-
         # Verify that all required fields are provided
         name = self._data.get("name")
         if name is None:

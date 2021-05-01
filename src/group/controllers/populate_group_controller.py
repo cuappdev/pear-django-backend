@@ -8,10 +8,6 @@ class PopulateGroupController:
         self._img_url = data[2]
 
     def process(self):
-        """Process a request to populate the database with group
-        data. Returns True for newly created unique groups and
-        False if a group with the given data exists already."""
-
         # Check if a group already exists with the given fields and return False if so
         group = Group.objects.filter(
             name=self._name, subtitle=self._subtitle, img_url=self._img_url

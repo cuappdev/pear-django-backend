@@ -10,8 +10,6 @@ class CreateInterestController:
         self._serializer = serializer
 
     def process(self):
-        """Process a request to create an interest."""
-
         # Verify that all required fields are provided
         name = self._data.get("name")
         if name is None:

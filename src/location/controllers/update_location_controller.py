@@ -12,8 +12,6 @@ class UpdateLocationController:
         self._serializer = serializer
 
     def process(self):
-        """Process a request to update a location's fields that have changed."""
-
         # Get the model
         location = Location.objects.filter(id=self._id)
         if location is None:
@@ -30,5 +28,6 @@ class UpdateLocationController:
         modify_attribute(location, "area", area)
         modify_attribute(location, "name", name)
 
+        # Save new changes
         location.save()
         return success_response(self._serializer(location).data, status.HTTP_200_OK)

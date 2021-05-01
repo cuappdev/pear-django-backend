@@ -14,7 +14,6 @@ class UpdatePersonController:
         self._person = self._user.person
 
     def process(self):
-        """Update person fields that have changed."""
         net_id = self._data.get("net_id")
         first_name = self._data.get("first_name")
         last_name = self._data.get("last_name")
