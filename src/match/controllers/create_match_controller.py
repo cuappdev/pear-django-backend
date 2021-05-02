@@ -16,12 +16,7 @@ class CreateMatchController:
         self._data = data
 
     def process(self):
-        """Process a request to create a match for dev-ing purposes.
-        The possible status code cases for a processed request include
-        - 200 if the request body describes an existing Match
-        - 201 if the request body describes a new Match (creates that match)
-        - 400 if the POST body is misformatted
-          - Returns an error message"""
+        """Process a request to create a match."""
         self._body = json.loads(self._request.body)
         match_ids = self._body.get("ids")
         if match_ids is None:
