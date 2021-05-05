@@ -25,7 +25,11 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG")
 
-ALLOWED_HOSTS = []
+SQLITE3 = os.getenv("SQLITE3") == "True"
+
+REDIS_LOCAL = os.getenv("REDIS_LOCAL") == "True"
+
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(",")
 
 
 # Application definition
@@ -84,13 +88,24 @@ REST_FRAMEWORK = {
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+if SQLITE3:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.getenv("POSTGRES_NAME"),
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+            "HOST": os.getenv("POSTGRES_HOST"),
+            "PORT": os.getenv("POSTGRES_PORT"),
+        }
+    }
 
 
 # Password validation
@@ -130,13 +145,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = "/static/"
+STATIC_ROOT = f"{BASE_DIR}/static"
 
 # Celery
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+if REDIS_LOCAL:
+    CELERY_BROKER_URL = "redis://localhost:6379"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379"
+else:
+    CELERY_BROKER_URL = "redis://redis:6379"
+    CELERY_RESULT_BACKEND = "redis://redis:6379"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
 
 # File parsing constants
 ASSETS_LOCATION = "../assets/"

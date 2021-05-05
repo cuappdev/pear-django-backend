@@ -1,0 +1,45 @@
+version: "3.4"
+
+services:
+  redis:
+    image: redis:latest
+    hostname: redis
+    networks:
+      - main
+    ports:
+      - "6379:6379"
+    restart: always
+
+  app:
+    build: .
+    env_file: .env
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && gunicorn pear.wsgi -b 0.0.0.0:8000"
+    container_name: app
+    depends_on:
+      - redis
+    expose:
+      - "8000"
+    hostname: app
+    image: app-image
+    networks:
+      - main
+    restart: on-failure
+
+  celery_worker:
+    image: cornellappdev/pear-django:${IMAGE_TAG}
+    hostname: celery_worker
+    env_file: .env
+    command: sh -c "./wait-for-it.sh redis:6379 && ./wait-for-it.sh app:8000 -- celery -A pear worker -l info"
+    depends_on:
+      - app
+      - redis
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+    networks:
+      - main
+    restart: always
+
+networks:
+  main:
