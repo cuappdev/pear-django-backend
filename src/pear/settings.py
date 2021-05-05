@@ -27,7 +27,9 @@ DEBUG = os.environ.get("DEBUG")
 
 SQLITE3 = os.getenv("SQLITE3") == "True"
 
-ALLOWED_HOSTS = []
+REDIS_LOCAL = os.getenv("REDIS_LOCAL") == "True"
+
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS").split(",")
 
 
 # Application definition
@@ -146,11 +148,16 @@ STATIC_URL = "/static/"
 STATIC_ROOT = f"{BASE_DIR}/static"
 
 # Celery
-CELERY_BROKER_URL = "redis://localhost:6379"
-CELERY_RESULT_BACKEND = "redis://localhost:6379"
+if REDIS_LOCAL:
+    CELERY_BROKER_URL = "redis://localhost:6379"
+    CELERY_RESULT_BACKEND = "redis://localhost:6379"
+else:
+    CELERY_BROKER_URL = "redis://redis:6379"
+    CELERY_RESULT_BACKEND = "redis://redis:6379"
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
 
 # File parsing constants
 ASSETS_LOCATION = "../assets/"
