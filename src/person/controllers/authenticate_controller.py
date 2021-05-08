@@ -41,8 +41,7 @@ class AuthenticateController:
         """Returns token information if `token` is valid. If in `DEBUG` mode, returns the request data."""
         if not api_settings.GOOGLE_DEBUG:
             try:
-                tokenstuff = id_token.verify_oauth2_token(token, requests.Request())
-                return tokenstuff
+                return id_token.verify_oauth2_token(token, requests.Request())
             except ValueError:
                 return None
         return self._data
