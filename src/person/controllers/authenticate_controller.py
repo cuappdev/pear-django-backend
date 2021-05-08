@@ -1,5 +1,3 @@
-import os
-
 from api import settings as api_settings
 from api.utils import failure_response
 from api.utils import success_response
@@ -41,9 +39,10 @@ class AuthenticateController:
 
     def _get_token_info(self, token):
         """Returns token information if `token` is valid. If in `DEBUG` mode, returns the request data."""
-        if not os.getenv("DEBUG", False):
+        if not api_settings.GOOGLE_DEBUG:
             try:
-                return id_token.verify_oauth2_token(token, requests.Request())
+                tokenstuff = id_token.verify_oauth2_token(token, requests.Request())
+                return tokenstuff
             except ValueError:
                 return None
         return self._data
