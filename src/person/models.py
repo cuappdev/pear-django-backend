@@ -3,7 +3,6 @@ from django.db import models
 from group.models import Group
 from interest.models import Interest
 from location.models import Location
-from match.models import Match
 
 
 class Person(models.Model):
@@ -19,9 +18,8 @@ class Person(models.Model):
     pronouns = models.CharField(max_length=20, default=None, null=True)
     goals = models.TextField(default=None, null=True)
     talking_points = models.TextField(default=None, null=True)
-    matches = models.ManyToManyField(Match, default=None)
     availability = models.TextField(default=None, null=True)
     locations = models.ManyToManyField(Location, default=None)
     interests = models.ManyToManyField(Interest, default=None)
     groups = models.ManyToManyField(Group, default=None)
-    onboarded = models.BooleanField(default=None, null=True)
+    has_onboarded = models.BooleanField(default=None, null=True)

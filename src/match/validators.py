@@ -2,31 +2,24 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 
-def validate_times_list(value):
-    updated_list = []
-    for value_element in value:
-        try:
-            nested_list = value_element.strip().split(",")
-            for index in range(len(nested_list)):
-                if nested_list[index] != "":
-                    nested_list[index] = float(nested_list[index])
-            updated_list.append(str(nested_list)[1:-1])
-        except (ValueError, TypeError):
+def validate_times_list(items):
+    """Validates a timestamps list. Ensures every element in items is a valid
+    availability for a day, which should be a list (without brackets) of floats.
+    Valid example: ["0,1", "18.5,19.5","","", "12", "0,1", "0,1,3,4,5"]
+    Precondition: items is a list of strings"""
+    for element in items:
+        nested_list = element.strip().split(",")
+        if not all(isinstance(element, float) for element in nested_list):
             raise ValidationError(
-                _(f"{value} is not a valid list of times"),
-                params={"value": value},
+                _(f"{items} is not a valid list of timestamps"),
+                params={"items": items},
             )
-    value = updated_list
 
 
-def validate_int_list(value):
-    updated_list = []
-    for value_element in value:
-        try:
-            updated_list.append(int(value_element))
-        except (ValueError, TypeError):
-            raise ValidationError(
-                _(f"{value} is not an int list"),
-                params={"value": value},
-            )
-    value = updated_list
+def validate_int_list(items):
+    """Precondition: items is a list"""
+    if not all(isinstance(element, int) for element in items):
+        raise ValidationError(
+            _(f"{items} is not an int list"),
+            params={"items": items},
+        )

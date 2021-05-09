@@ -2,7 +2,7 @@ import json
 
 from location.serializers import LocationSerializer
 from match.models import Match
-from person.serializers import UserSerializer
+from person.simple_serializers import SimpleUserSerializer
 from rest_framework import serializers
 
 
@@ -20,10 +20,10 @@ class MatchSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
 
     def get_matched_user(self, match):
-        if self.request_user.id == match.user_1.id:
-            return UserSerializer(match.user_2).data
+        if self.request_user == match.user_1:
+            return SimpleUserSerializer(match.user_2).data
         elif self.request_user.id == match.user_2.id:
-            return UserSerializer(match.user_1).data
+            return SimpleUserSerializer(match.user_1).data
 
     def get_accepted_ids(self, match):
         if match.accepted_ids is None:
@@ -36,6 +36,7 @@ class MatchSerializer(serializers.ModelSerializer):
     def get_proposed_meeting_times(self, match):
         if match.proposed_meeting_times is None:
             return None
+        # We have to replace all single quotes with double quotes for JSON
         proposed_meeting_times = json.loads(
             match.proposed_meeting_times.replace("'", '"')
         )
@@ -83,7 +84,10 @@ class BothUsersMatchSerializer(serializers.ModelSerializer):
     meeting_location = serializers.SerializerMethodField("get_meeting_location")
 
     def get_users(self, match):
-        return UserSerializer(match.user_1).data, UserSerializer(match.user_2).data
+        return (
+            SimpleUserSerializer(match.user_1).data,
+            SimpleUserSerializer(match.user_2).data,
+        )
 
     def get_accepted_ids(self, match):
         if match.accepted_ids is None:
