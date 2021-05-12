@@ -24,33 +24,56 @@ class UpdateMatchController:
         self._match = self._match[0]
         proposed_meeting_times = self._data.get("proposed_meeting_times")
         proposed_locations = self._data.get("proposed_locations")
-        meeting_location = self._data.get("meeting_location")
+        meeting_location_id = self._data.get("meeting_location")
         meeting_time = self._data.get("meeting_time")
 
-        # Next, modify the attributes that may have changed
-        error_responses = []
+        # Next, modify the attributes that may have changed:
+        # Proposed Meeting Times
         self._modify_attribute("proposed_meeting_times", proposed_meeting_times)
+        # Meeting Time
         if meeting_time is not None:
             self._update_meeting_time(meeting_time)
+        # Proposed Locations
         if proposed_locations is not None:
-            error_responses.append(self._update_proposed_locations(proposed_locations))
-        if meeting_location is not None:
-            error_responses.append(self._update_meeting_location(meeting_location))
+            for loc_id in proposed_locations:
+                new_location = Location.objects.filter(id=loc_id)
+                if not new_location:
+                    return failure_response(f"Location id {loc_id} does not exist.")
+                if new_location[0] not in self._match.proposed_locations.all():
+                    self._match.proposed_locations.add(new_location[0])
+            for existing_location in self._match.proposed_locations.all():
+                if existing_location.id not in proposed_locations:
+                    self._match.proposed_locations.remove(existing_location)
+        # Meeting Location
+        if meeting_location_id is not None:
+            new_meeting_location = Location.objects.filter(id=meeting_location_id)
+            if not new_meeting_location:
+                return failure_response(
+                    f"Location with id {meeting_location_id} does not exist."
+                )
+            self._modify_attribute("meeting_location", new_meeting_location[0])
 
-        # Based on what changed, update the match status
-        error_responses.append(
-            self._update_match_status(
-                proposed_meeting_times,
-                proposed_locations,
-                meeting_location,
-                meeting_time,
-            )
+        # Based on what changed, check for status conflicts
+        if proposed_meeting_times is not None and proposed_locations is not None:
+            # In case match is already proposed
+            if self._match.status == match_status.PROPOSED:
+                return failure_response(
+                    "Match has already been proposed", status.HTTP_400_BAD_REQUEST
+                )
+        elif meeting_location_id is not None and meeting_time is not None:
+            # In case match is already active
+            if self._match.status == match_status.ACTIVE:
+                return failure_response(
+                    "Match has already been accepted", status.HTTP_400_BAD_REQUEST
+                )
+
+        # Finally, update the match status
+        self._update_match_status(
+            proposed_meeting_times,
+            proposed_locations,
+            meeting_location_id,
+            meeting_time,
         )
-
-        # If we had any errors, return those errors before saving
-        for error in error_responses:
-            if error is not None:
-                return error
 
         self._match.save()
         return success_response()
@@ -59,29 +82,6 @@ class UpdateMatchController:
         """Modify an attribute if it isn't None and has been changed."""
         if attr_value is not None and attr_value != getattr(self._match, attr_name):
             setattr(self._match, attr_name, attr_value)
-
-    def _update_proposed_locations(self, body_proposed_locations):
-        """Update the proposed locations."""
-        for new_location_id in body_proposed_locations:
-            new_location = Location.objects.filter(id=new_location_id)
-            if not new_location:
-                return failure_response(
-                    f"Location with id {new_location_id} does not exist."
-                )
-            if new_location[0] not in self._match.proposed_locations.all():
-                self._match.proposed_locations.add(new_location[0])
-        for existing_location in self._match.proposed_locations.all():
-            if existing_location.id not in body_proposed_locations:
-                self._match.proposed_locations.remove(existing_location)
-
-    def _update_meeting_location(self, body_meeting_location_id):
-        """Update the meeting location."""
-        new_meeting_location = Location.objects.filter(id=body_meeting_location_id)
-        if not new_meeting_location:
-            return failure_response(
-                f"Location with id {body_meeting_location_id} does not exist."
-            )
-        self._modify_attribute("meeting_location", new_meeting_location[0])
 
     def _update_meeting_time(self, times):
         """Given a list with one time, generate a timestamp.
@@ -107,20 +107,10 @@ class UpdateMatchController:
     ):
         """Update status based on match field changes."""
         if proposed_meeting_times is not None and proposed_locations is not None:
-            # In case match is already proposed
-            if self._match.status == match_status.PROPOSED:
-                return failure_response(
-                    "Match has already been proposed", status.HTTP_400_BAD_REQUEST
-                )
             self._match.status = match_status.PROPOSED
             self._match.proposer_id = self._user.id
             self._match.accepted_ids = [self._user.id]
         elif meeting_location is not None and meeting_time is not None:
-            # In case match is already active
-            if self._match.status == match_status.ACTIVE:
-                return failure_response(
-                    "Match has already been accepted", status.HTTP_400_BAD_REQUEST
-                )
             self._match.status = match_status.ACTIVE
             # use json.loads to convert a string of a list to an actual list
             accepted_ids = json.loads(self._match.accepted_ids)

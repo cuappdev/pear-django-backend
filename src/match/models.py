@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 from location.models import Location
-from match.validators import validate_int_list
-from match.validators import validate_times_list
 
 
 class Match(models.Model):
@@ -25,12 +23,9 @@ class Match(models.Model):
     accepted_ids = models.CharField(
         default=None,
         null=True,
-        validators=[validate_int_list],
         max_length=10,
     )
-    proposed_meeting_times = models.TextField(
-        default="[]", null=True, validators=[validate_times_list]
-    )
+    proposed_meeting_times = models.TextField(default="[]", null=True)
     proposed_locations = models.ManyToManyField(
         Location, default=None, related_name="matches_proposed"
     )

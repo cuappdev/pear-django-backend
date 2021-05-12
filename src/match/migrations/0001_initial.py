@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import migrations
 from django.db import models
 import django.db.models.deletion
-import match.validators
 
 
 class Migration(migrations.Migration):
@@ -37,7 +36,6 @@ class Migration(migrations.Migration):
                         default=None,
                         max_length=10,
                         null=True,
-                        validators=[match.validators.validate_int_list],
                     ),
                 ),
                 (
@@ -45,7 +43,6 @@ class Migration(migrations.Migration):
                     models.TextField(
                         default=None,
                         null=True,
-                        validators=[match.validators.validate_times_list],
                     ),
                 ),
                 (

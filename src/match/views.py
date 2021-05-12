@@ -9,6 +9,7 @@ from match.models import Match
 from match.serializers import BothUsersMatchSerializer
 from match.serializers import MatchSerializer
 from rest_framework import generics
+from rest_framework import status
 
 from .controllers.create_match_controller import CreateMatchController
 from .controllers.update_match_controller import UpdateMatchController
@@ -40,8 +41,10 @@ class MatchView(generics.GenericAPIView):
         """Get match by id."""
         match = Match.objects.filter(id=id)
         if match:
-            return success_response(self.serializer_class(match[0]).data)
-        return failure_response("Match does not exist")
+            return success_response(
+                self.serializer_class(match[0]).data, status.HTTP_200_OK
+            )
+        return failure_response("Match does not exist", status.HTTP_404_NOT_FOUND)
 
     def post(self, request, id):
         """Update match by id."""
@@ -57,7 +60,7 @@ class MatchView(generics.GenericAPIView):
         """Delete a match by id."""
         match = Match.objects.filter(id=id)
         if not match:
-            return failure_response("Match does not exist")
+            return failure_response("Match does not exist", status.HTTP_404_NOT_FOUND)
         match[0].delete()
         return success_response()
 
@@ -70,7 +73,7 @@ class CancelMatchView(generics.GenericAPIView):
         """Cancel match by id."""
         match = Match.objects.filter(id=id)
         if not match:
-            return failure_response("Match does not exist.")
+            return failure_response("Match does not exist.", status.HTTP_404_NOT_FOUND)
         match[0].status = match_status.CANCELED
         match[0].save()
         return success_response()
@@ -86,8 +89,10 @@ class CurrentMatchView(generics.GenericAPIView):
             Q(user_1=request.user) | Q(user_2=request.user)
         ).order_by("-created_date")
         if not match:
-            return failure_response("Match does not exist")
-        return success_response(MatchSerializer(match[0], user=request.user).data)
+            return failure_response("Match does not exist", status.HTTP_404_NOT_FOUND)
+        return success_response(
+            MatchSerializer(match[0], user=request.user).data, status.HTTP_200_OK
+        )
 
     def post(self, request):
         """Update current match for current user."""
@@ -102,7 +107,7 @@ class CurrentMatchView(generics.GenericAPIView):
             return UpdateMatchController(
                 match[0].id, request.user, data, self.serializer_class
             ).process()
-        return failure_response("Match does not exist")
+        return failure_response("Match does not exist", status.HTTP_404_NOT_FOUND)
 
 
 class CancelCurrentMatchView(generics.GenericAPIView):
@@ -115,7 +120,7 @@ class CancelCurrentMatchView(generics.GenericAPIView):
             Q(user_1=request.user) | Q(user_2=request.user)
         ).order_by("-created_date")
         if not match:
-            return failure_response("Match does not exist")
+            return failure_response("Match does not exist", status.HTTP_404_NOT_FOUND)
         match = match[0]
         match.status = match_status.CANCELED
         match.save()

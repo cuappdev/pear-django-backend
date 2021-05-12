@@ -22,16 +22,14 @@ class MatchSerializer(serializers.ModelSerializer):
     def get_matched_user(self, match):
         if self.request_user == match.user_1:
             return SimpleUserSerializer(match.user_2).data
-        elif self.request_user.id == match.user_2.id:
+        elif self.request_user == match.user_2:
             return SimpleUserSerializer(match.user_1).data
 
     def get_accepted_ids(self, match):
         if match.accepted_ids is None:
             return None
         accepted_ids = json.loads(match.accepted_ids)
-        if accepted_ids == []:
-            return None
-        return accepted_ids
+        return accepted_ids or None
 
     def get_proposed_meeting_times(self, match):
         if match.proposed_meeting_times is None:
@@ -84,18 +82,16 @@ class BothUsersMatchSerializer(serializers.ModelSerializer):
     meeting_location = serializers.SerializerMethodField("get_meeting_location")
 
     def get_users(self, match):
-        return (
-            SimpleUserSerializer(match.user_1).data,
-            SimpleUserSerializer(match.user_2).data,
-        )
+        serializer = SimpleUserSerializer(data=[match.user_1, match.user_2], many=True)
+        # because data is passed w/ multiple users, check validity before returning
+        serializer.is_valid()
+        return serializer.data
 
     def get_accepted_ids(self, match):
         if match.accepted_ids is None:
             return None
         accepted_ids = json.loads(match.accepted_ids)
-        if accepted_ids == []:
-            return None
-        return accepted_ids
+        return accepted_ids or None
 
     def get_proposed_meeting_times(self, match):
         if match.proposed_meeting_times is None:
@@ -108,18 +104,13 @@ class BothUsersMatchSerializer(serializers.ModelSerializer):
         return proposed_meeting_times
 
     def get_proposed_locations(self, match):
-        proposed_locations = []
-        for location in match.proposed_locations.all():
-            proposed_locations.append(LocationSerializer(location).data)
-        if proposed_locations == []:
-            return None
-        return proposed_locations
+        return (
+            LocationSerializer(match.proposed_locations.all(), many=True).data or None
+        )
 
     def get_meeting_location(self, match):
         meeting_location = LocationSerializer(match.meeting_location).data
-        if meeting_location == {}:
-            return None
-        return meeting_location
+        return meeting_location or None
 
     class Meta:
         model = Match

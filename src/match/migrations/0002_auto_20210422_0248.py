@@ -2,7 +2,6 @@
 
 from django.db import migrations
 from django.db import models
-import match.validators
 
 
 class Migration(migrations.Migration):
@@ -18,7 +17,6 @@ class Migration(migrations.Migration):
             field=models.TextField(
                 default="[]",
                 null=True,
-                validators=[match.validators.validate_times_list],
             ),
         ),
     ]
