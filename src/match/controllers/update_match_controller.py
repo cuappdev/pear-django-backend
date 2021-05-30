@@ -35,15 +35,13 @@ class UpdateMatchController:
             self._update_meeting_time(meeting_time)
         # Proposed Locations
         if proposed_locations is not None:
+            new_locations = []
             for loc_id in proposed_locations:
                 new_location = Location.objects.filter(id=loc_id)
                 if not new_location:
                     return failure_response(f"Location id {loc_id} does not exist.")
-                if new_location[0] not in self._match.proposed_locations.all():
-                    self._match.proposed_locations.add(new_location[0])
-            for existing_location in self._match.proposed_locations.all():
-                if existing_location.id not in proposed_locations:
-                    self._match.proposed_locations.remove(existing_location)
+                new_locations.append(new_location[0])
+            self._match.proposed_locations.set(new_locations)
         # Meeting Location
         if meeting_location_id is not None:
             new_meeting_location = Location.objects.filter(id=meeting_location_id)

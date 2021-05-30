@@ -27,15 +27,10 @@ class CreateMatchController:
             return failure_response(f"User with id {max(match_ids)} does not exist")
         user_1 = user_1[0]
         user_2 = user_2[0]
-        possible_match_1 = Match.objects.filter(
+        possible_match = Match.objects.filter(
             user_1=user_1, user_2=user_2, status=match_status.CREATED
         )
-        if possible_match_1:
-            return success_response(None, status.HTTP_200_OK)
-        possible_match_2 = Match.objects.filter(
-            user_1=user_2, user_2=user_1, status=match_status.CREATED
-        )
-        if possible_match_2:
+        if possible_match:
             return success_response(None, status.HTTP_200_OK)
         match = Match.objects.create(
             status=match_status.CREATED,
