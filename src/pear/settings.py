@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "group",
     "interest",
     "location",
+    "match",
     "person",
 ]
 
