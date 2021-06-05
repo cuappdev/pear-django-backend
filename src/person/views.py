@@ -1,13 +1,16 @@
 import json
 
 from api import settings as api_settings
+from api.utils import failure_response
 from api.utils import success_response
+from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework import status
 
 from .controllers.authenticate_controller import AuthenticateController
 from .controllers.update_person_controller import UpdatePersonController
 from .serializers import AuthenticateSerializer
+from .serializers import SimpleUserSerializer
 from .serializers import UserSerializer
 
 
@@ -40,4 +43,30 @@ class MeView(generics.GenericAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             data = request.data
-        return UpdatePersonController(request, data, self.serializer_class).process()
+        return UpdatePersonController(
+            request.user, data, self.serializer_class
+        ).process()
+
+
+class UserView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def get(self, request, id):
+        """Get user by id."""
+        user = User.objects.filter(id=id)
+        if not user:
+            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        return success_response(self.serializer_class(user[0]).data, status.HTTP_200_OK)
+
+
+class UsersView(generics.GenericAPIView):
+    serializer_class = SimpleUserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def get(self, request):
+        """Get user by id."""
+        users = User.objects.filter(person__has_onboarded=True)
+        return success_response(
+            self.serializer_class(users, many=True).data, status.HTTP_200_OK
+        )

@@ -14,11 +14,15 @@ from match.views import MatchesView
 from match.views import MatchView
 from person.views import AuthenticateView
 from person.views import MeView
+from person.views import UsersView
+from person.views import UserView
 
 
 urlpatterns = [
     path("authenticate/", AuthenticateView.as_view(), name="authenticate"),
     path("me/", MeView.as_view(), name="me"),
+    path("users/", UsersView.as_view(), name="users"),
+    path("users/<int:id>/", UserView.as_view(), name="user"),
     path("interests/", InterestsView.as_view(), name="interests"),
     path("interests/<int:id>/", InterestView.as_view(), name="interest"),
     path("groups/", GroupsView.as_view(), name="groups"),
