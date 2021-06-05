@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "location",
     "match",
     "person",
+    "major",
 ]
 
 MIDDLEWARE = [
@@ -161,5 +162,5 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
 # File parsing constants
-ASSETS_LOCATION = "../assets/"
+ASSETS_LOCATION = "assets/"
 ASSETS_SPLITTER = "|"

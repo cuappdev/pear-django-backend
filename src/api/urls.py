@@ -7,6 +7,8 @@ from interest.views import InterestsView
 from interest.views import InterestView
 from location.views import LocationsView
 from location.views import LocationView
+from major.views import MajorsView
+from major.views import MajorView
 from match.views import CancelCurrentMatchView
 from match.views import CancelMatchView
 from match.views import CurrentMatchView
@@ -29,6 +31,8 @@ urlpatterns = [
     path("groups/<int:id>/", GroupView.as_view(), name="group"),
     path("locations/", LocationsView.as_view(), name="locations"),
     path("locations/<int:id>/", LocationView.as_view(), name="location"),
+    path("majors/", MajorsView.as_view(), name="majors"),
+    path("majors/<int:id>/", MajorView.as_view(), name="major"),
     path("matches/", MatchesView.as_view(), name="matches"),
     path("matches/<int:id>/", MatchView.as_view(), name="match"),
     path("matches/<int:id>/cancel/", CancelMatchView.as_view(), name="cancel_match"),
