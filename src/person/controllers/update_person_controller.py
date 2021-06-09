@@ -4,6 +4,7 @@ from api.utils import success_response
 from group.models import Group
 from interest.models import Interest
 from location.models import Location
+from major.models import Major
 from rest_framework import status
 
 from ..tasks import upload_profile_pic
@@ -20,22 +21,29 @@ class UpdatePersonController:
         net_id = self._data.get("net_id")
         first_name = self._data.get("first_name")
         last_name = self._data.get("last_name")
+        major_ids = self._data.get("majors")
         hometown = self._data.get("hometown")
         profile_pic_base64 = self._data.get("profile_pic_base64")
         facebook_url = self._data.get("facebook_url")
         instagram_username = self._data.get("instagram_username")
         graduation_year = self._data.get("graduation_year")
         pronouns = self._data.get("pronouns")
-
         goals = self._data.get("goals")
         talking_points = self._data.get("talking_points")
-
         availability = self._data.get("availability")
         locations = self._data.get("locations")
         groups = self._data.get("groups")
         interests = self._data.get("interests")
-
         has_onboarded = self._data.get("has_onboarded")
+
+        if major_ids is not None:
+            new_majors = []
+            for id in major_ids:
+                new_major = Major.objects.filter(id=id)
+                if not new_major:
+                    return failure_response(f"Major id {id} does not exist.")
+                new_majors.append(new_major[0])
+            self._person.majors.set(new_majors)
 
         if profile_pic_base64 is not None:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)

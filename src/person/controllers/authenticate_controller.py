@@ -119,5 +119,6 @@ class AuthenticateController:
             "user": user,
             "net_id": net_id,
             "profile_pic_url": profile_pic_url,
+            "has_onboarded": False,
         }
         self._create_person(person_data)
