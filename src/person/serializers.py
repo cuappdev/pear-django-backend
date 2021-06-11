@@ -47,19 +47,14 @@ class UserSerializer(serializers.ModelSerializer):
     interests = InterestSerializer(source="person.interests", many=True)
     groups = GroupSerializer(source="person.groups", many=True)
     has_onboarded = serializers.BooleanField(source="person.has_onboarded")
+    pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
-    previous_match = serializers.SerializerMethodField("get_previous_match")
 
     def get_goals(self, user):
         if user.person.goals is None:
             return []
         goals = json.loads(user.person.goals.replace("'", '"'))
         return goals
-
-    def get_has_onboarded(self, user):
-        if user.person.has_onboarded is None:
-            return False
-        return user.person.has_onboarded
 
     def get_talking_points(self, user):
         if user.person.talking_points is None:
@@ -80,14 +75,6 @@ class UserSerializer(serializers.ModelSerializer):
         if len(matches) == 0:
             return None
         return MatchSerializer(matches[0], user=user).data
-
-    def get_previous_match(self, user):
-        matches = Match.objects.filter(Q(user_1=user) | Q(user_2=user)).order_by(
-            "-created_date"
-        )
-        if len(matches) <= 1:
-            return None
-        return MatchSerializer(matches[1], user=user).data
 
     class Meta:
         model = User
@@ -110,8 +97,8 @@ class UserSerializer(serializers.ModelSerializer):
             "interests",
             "groups",
             "has_onboarded",
+            "pending_feedback",
             "current_match",
-            "previous_match",
         )
         read_only_fields = fields
 
@@ -121,6 +108,8 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     net_id = serializers.CharField(source="person.net_id")
     profile_pic_url = serializers.CharField(source="person.profile_pic_url")
+    majors = MajorSerializer(source="person.majors", many=True)
+    graduation_year = serializers.CharField(source="person.graduation_year")
     interests = InterestSerializer(source="person.interests", many=True)
     groups = GroupSerializer(source="person.groups", many=True)
 
@@ -132,6 +121,8 @@ class SimpleUserSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "profile_pic_url",
+            "majors",
+            "graduation_year",
             "interests",
             "groups",
         )

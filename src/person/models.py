@@ -24,4 +24,5 @@ class Person(models.Model):
     locations = models.ManyToManyField(Location, default=None, blank=True)
     interests = models.ManyToManyField(Interest, default=None, blank=True)
     groups = models.ManyToManyField(Group, default=None, blank=True)
-    has_onboarded = models.BooleanField(default=False, null=True)
+    has_onboarded = models.BooleanField(default=False)
+    pending_feedback = models.BooleanField(default=False)
