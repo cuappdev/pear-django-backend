@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 
 class MatchUserSerializer(serializers.ModelSerializer):
-    """Serializer with no match history."""
+    """User serializer that excludes match history."""
 
     net_id = serializers.CharField(source="person.net_id")
     hometown = serializers.CharField(source="person.hometown")

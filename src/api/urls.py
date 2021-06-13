@@ -14,6 +14,7 @@ from match.views import CancelMatchView
 from match.views import CurrentMatchView
 from match.views import MatchesView
 from match.views import MatchView
+from person.views import AllMatchesView
 from person.views import AuthenticateView
 from person.views import MeView
 from person.views import UsersView
@@ -25,6 +26,7 @@ urlpatterns = [
     path("me/", MeView.as_view(), name="me"),
     path("users/", UsersView.as_view(), name="users"),
     path("users/<int:id>/", UserView.as_view(), name="user"),
+    path("users/<int:id>/matches/", AllMatchesView.as_view(), name="user_matches"),
     path("interests/", InterestsView.as_view(), name="interests"),
     path("interests/<int:id>/", InterestView.as_view(), name="interest"),
     path("groups/", GroupsView.as_view(), name="groups"),
