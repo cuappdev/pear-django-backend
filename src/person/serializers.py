@@ -109,6 +109,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
     net_id = serializers.CharField(source="person.net_id")
     profile_pic_url = serializers.CharField(source="person.profile_pic_url")
     majors = MajorSerializer(source="person.majors", many=True)
+    hometown = serializers.CharField(source="person.hometown")
     graduation_year = serializers.CharField(source="person.graduation_year")
     interests = InterestSerializer(source="person.interests", many=True)
     groups = GroupSerializer(source="person.groups", many=True)
@@ -122,6 +123,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
             "last_name",
             "profile_pic_url",
             "majors",
+            "hometown",
             "graduation_year",
             "interests",
             "groups",
