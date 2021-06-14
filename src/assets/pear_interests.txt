@@ -1,15 +1,15 @@
-Art|painting, crafts, embroidery|
-Business|entrepreneurship, finance, VC|
-Dance|urban, hip hop, ballet, swing|
-Design|UI/UX, graphic, print|
-Fashion||
-Fitness|working out, outdoors, basketball|
-Food|cooking, eating, baking|
-Humanities|history, politics|
-Music|instruments, producing, acapella|
-Photography|digital, analog|
-Reading||
-Sustainability||
-Tech|programming, web/app development|
-Travel|road, trips, backpacking|
-TV & Film||
+Activism|social justice, sustainability...|2l21b3rj.png
+Art|painting, crafts, embroidery...|esz8m4rw.png
+Business|entrepreneurship, finance, VC...|y8n3m1zq.png
+Dance|urban, hip hop, ballet, swing...|vbi3n4yk.png
+Design|experience, graphic, print...|uk18a2sm.png
+Fashion|fashion design, photography, news...|qdnr1lfj.png
+Fitness|working out, outdoors, basketball...|mj6xl18q.png
+Food|cooking, eating, baking...|simfz2vf.png
+Humanities|history, politics...|fmha0lko.png
+Literature|reading, writing...|4lebx35j.png
+Music|instruments, producing, a capella...|t5st8mcn.png
+Photography|digital, analog...|jko4ypbc.png
+Shows|films, TV, theater...|tz99fecx.png
+Technology|programming, web/app development...|5q28lrt9.png
+Travel|road trips, backpacking...|87qaxu8g.png

@@ -164,3 +164,7 @@ CELERY_TIMEZONE = TIME_ZONE
 # File parsing constants
 ASSETS_LOCATION = "assets/"
 ASSETS_SPLITTER = "|"
+
+# Other constants
+IMAGE_HOST_BASE = os.getenv("IMAGE_HOST_BASE")
+DEFAULT_GROUP_IMAGE_TAG = "75cq1zwe.png"

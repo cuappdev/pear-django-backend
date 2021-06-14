@@ -1,11 +1,14 @@
 from group.models import Group
+from pear import settings
 
 
 class PopulateGroupController:
     def __init__(self, data):
         self._name = data[0]
         self._subtitle = data[1]
-        self._img_url = data[2]
+        # This is a temporary measure until our upload service has been updated
+        image_tag = settings.DEFAULT_GROUP_IMAGE_TAG if data[2] == "" else data[2]
+        self._img_url = settings.IMAGE_HOST_BASE + image_tag
 
     def process(self):
         # Check if a group already exists with the given fields and return False if so
