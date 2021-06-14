@@ -8,6 +8,7 @@ from rest_framework import generics
 from rest_framework import status
 
 from .controllers.authenticate_controller import AuthenticateController
+from .controllers.search_person_controller import SearchPersonController
 from .controllers.update_person_controller import UpdatePersonController
 from .serializers import AuthenticateSerializer
 from .serializers import SimpleUserSerializer
@@ -65,8 +66,5 @@ class UsersView(generics.GenericAPIView):
     permission_classes = api_settings.CONSUMER_PERMISSIONS
 
     def get(self, request):
-        """Get user by id."""
-        users = User.objects.filter(person__has_onboarded=True)
-        return success_response(
-            self.serializer_class(users, many=True).data, status.HTTP_200_OK
-        )
+        """Get users requested with search query."""
+        return SearchPersonController(request.GET, self.serializer_class).process()
