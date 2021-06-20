@@ -1,11 +1,12 @@
 from interest.models import Interest
+from pear import settings
 
 
 class PopulateInterestController:
     def __init__(self, data):
         self._name = data[0]
         self._subtitle = data[1]
-        self._img_url = data[2]
+        self._img_url = settings.IMAGE_HOST_BASE + data[2]
 
     def process(self):
         # Check if a interest already exists with the given fields and return False if so
