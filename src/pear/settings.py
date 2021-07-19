@@ -167,4 +167,4 @@ ASSETS_SPLITTER = "|"
 
 # Other constants
 IMAGE_HOST_BASE = os.getenv("IMAGE_HOST_BASE")
-DEFAULT_GROUP_IMAGE_TAG = "75cq1zwe.png"
+DEFAULT_GROUP_IMAGE_TAG = "esictb6y.png"
