@@ -4,6 +4,7 @@ from group.models import Group
 from interest.models import Interest
 from location.models import Location
 from major.models import Major
+from prompt.models import Prompt
 
 
 class Person(models.Model):
@@ -24,5 +25,7 @@ class Person(models.Model):
     locations = models.ManyToManyField(Location, default=None, blank=True)
     interests = models.ManyToManyField(Interest, default=None, blank=True)
     groups = models.ManyToManyField(Group, default=None, blank=True)
+    prompt_questions = models.ManyToManyField(Prompt, default=None, blank=True)
+    prompt_answers = models.TextField(default=None, null=True)
     has_onboarded = models.BooleanField(default=False)
     pending_feedback = models.BooleanField(default=False)

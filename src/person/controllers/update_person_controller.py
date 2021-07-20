@@ -5,6 +5,7 @@ from group.models import Group
 from interest.models import Interest
 from location.models import Location
 from major.models import Major
+from prompt.models import Prompt
 from rest_framework import status
 
 from ..tasks import upload_profile_pic
@@ -33,6 +34,7 @@ class UpdatePersonController:
         availability = self._data.get("availability")
         location_ids = self._data.get("locations")
         group_ids = self._data.get("groups")
+        prompts = self._data.get("prompts")
         interest_ids = self._data.get("interests")
         has_onboarded = self._data.get("has_onboarded")
         pending_feedback = self._data.get("pending_feedback")
@@ -77,6 +79,19 @@ class UpdatePersonController:
                     )
                 new_interests.append(new_interest[0])
             self._person.interests.set(new_interests)
+
+        if prompts is not None:
+            prompt_questions = []
+            prompt_answers = []
+            for prompt in prompts:
+                prompt_id = prompt["question_id"]
+                prompt_question = Prompt.objects.filter(id=prompt_id)
+                if not prompt_question:
+                    return failure_response(f"Prompt id {prompt_id} does not exist.")
+                prompt_questions.append(prompt_question[0])
+                prompt_answers.append(prompt["answer"])
+            self._person.prompt_questions.set(prompt_questions)
+            modify_attribute(self._person, "prompt_answers", prompt_answers)
 
         modify_attribute(self._person, "net_id", net_id)
         modify_attribute(self._user, "first_name", first_name)

@@ -46,6 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
     locations = LocationSerializer(source="person.locations", many=True)
     interests = InterestSerializer(source="person.interests", many=True)
     groups = GroupSerializer(source="person.groups", many=True)
+    prompts = SerializerMethodField("get_prompts")
     has_onboarded = serializers.BooleanField(source="person.has_onboarded")
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
@@ -76,6 +77,25 @@ class UserSerializer(serializers.ModelSerializer):
             return None
         return MatchSerializer(matches[0], user=user).data
 
+    def get_prompts(self, user):
+        prompt_questions = user.person.prompt_questions.all()
+        prompt_answers = user.person.prompt_answers
+        if prompt_answers is None:
+            return []
+        # We have to replace all single quotes with double quotes for JSON
+        prompt_answers = json.loads(prompt_answers.replace("'", '"'))
+        prompts = []
+        for question_index in range(len(prompt_questions)):
+            prompts.append(
+                {
+                    "question_id": prompt_questions[question_index].id,
+                    "question_name": prompt_questions[question_index].question_name,
+                    "label_users_see": prompt_questions[question_index].label_users_see,
+                    "answer": prompt_answers[question_index],
+                }
+            )
+        return prompts
+
     class Meta:
         model = User
         fields = (
@@ -96,6 +116,7 @@ class UserSerializer(serializers.ModelSerializer):
             "locations",
             "interests",
             "groups",
+            "prompts",
             "has_onboarded",
             "pending_feedback",
             "current_match",
