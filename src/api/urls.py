@@ -19,6 +19,8 @@ from person.views import AuthenticateView
 from person.views import MeView
 from person.views import UsersView
 from person.views import UserView
+from survey.views import SurveysView
+from survey.views import SurveyView
 
 
 urlpatterns = [
@@ -44,6 +46,8 @@ urlpatterns = [
         CancelCurrentMatchView.as_view(),
         name="cancel_current_match",
     ),
+    path("surveys/", SurveysView.as_view(), name="surveys"),
+    path("surveys/<int:id>/", SurveyView.as_view(), name="survey"),
     path("populate/", PopulateView.as_view(), name="populate"),
     path("countdown/", CountdownDummyView.as_view(), name="countdown"),
 ]
