@@ -54,19 +54,19 @@ class UserSerializer(serializers.ModelSerializer):
     def get_goals(self, user):
         if user.person.goals is None:
             return []
-        goals = json.loads(user.person.goals.replace("'", '"'))
+        goals = json.loads(user.person.goals)
         return goals
 
     def get_talking_points(self, user):
         if user.person.talking_points is None:
             return []
-        talking_points = json.loads(user.person.talking_points.replace("'", '"'))
+        talking_points = json.loads(user.person.talking_points)
         return talking_points
 
     def get_availability(self, user):
         if user.person.availability is None:
             return []
-        availability = json.loads(user.person.availability.replace("'", '"'))
+        availability = json.loads(user.person.availability)
         return availability
 
     def get_current_match(self, user):
@@ -82,8 +82,7 @@ class UserSerializer(serializers.ModelSerializer):
         prompt_answers = user.person.prompt_answers
         if prompt_answers is None:
             return []
-        # We have to replace all single quotes with double quotes for JSON
-        prompt_answers = json.loads(prompt_answers.replace("'", '"'))
+        prompt_answers = json.loads(prompt_answers)
         prompts = []
         for question_index in range(len(prompt_questions)):
             prompts.append(

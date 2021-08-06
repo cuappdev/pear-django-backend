@@ -24,9 +24,9 @@ from prompt.views import PromptView
 
 
 urlpatterns = [
+    # User URLs
     path("authenticate/", AuthenticateView.as_view(), name="authenticate"),
     path("me/", MeView.as_view(), name="me"),
-    # User URLs
     path("users/", UsersView.as_view(), name="users"),
     path("users/<int:id>/", UserView.as_view(), name="user"),
     path("users/<int:id>/matches/", AllMatchesView.as_view(), name="user_matches"),

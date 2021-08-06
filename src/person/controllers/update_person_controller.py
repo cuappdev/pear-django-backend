@@ -1,3 +1,5 @@
+import json
+
 from api.utils import failure_response
 from api.utils import modify_attribute
 from api.utils import success_response
@@ -91,7 +93,7 @@ class UpdatePersonController:
                 prompt_questions.append(prompt_question[0])
                 prompt_answers.append(prompt["answer"])
             self._person.prompt_questions.set(prompt_questions)
-            modify_attribute(self._person, "prompt_answers", prompt_answers)
+            modify_attribute(self._person, "prompt_answers", json.dumps(prompt_answers))
 
         modify_attribute(self._person, "net_id", net_id)
         modify_attribute(self._user, "first_name", first_name)
@@ -101,11 +103,11 @@ class UpdatePersonController:
         modify_attribute(self._person, "instagram_username", instagram_username)
         modify_attribute(self._person, "graduation_year", graduation_year)
         modify_attribute(self._person, "pronouns", pronouns)
-        modify_attribute(self._person, "goals", goals)
-        modify_attribute(self._person, "talking_points", talking_points)
+        modify_attribute(self._person, "goals", json.dumps(goals))
+        modify_attribute(self._person, "talking_points", json.dumps(talking_points))
         modify_attribute(self._person, "has_onboarded", has_onboarded)
         modify_attribute(self._person, "pending_feedback", pending_feedback)
-        modify_attribute(self._person, "availability", availability)
+        modify_attribute(self._person, "availability", json.dumps(availability))
         self._user.save()
         self._person.save()
         return success_response(status=status.HTTP_200_OK)
