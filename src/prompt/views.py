@@ -24,7 +24,7 @@ class PromptsView(generics.GenericAPIView):
         )
 
     def post(self, request):
-        """Create an prompt."""
+        """Create a prompt."""
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
@@ -54,7 +54,7 @@ class PromptView(generics.GenericAPIView):
         return UpdatePromptController(id, data, self.serializer_class).process()
 
     def delete(self, request, id):
-        """Delete an prompt by id."""
+        """Delete prompt by id."""
         prompt = Prompt.objects.filter(id=id)
         if not prompt:
             return failure_response("Prompt does not exist", status.HTTP_404_NOT_FOUND)

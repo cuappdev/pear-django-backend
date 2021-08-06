@@ -18,16 +18,16 @@ class CreatePromptController:
             )
 
         # Get label field
-        label = self._data.get("label_users_see")
+        label = self._data.get("question_placeholder")
 
         # Check if a prompt already exists with the given fields and return it if so
-        prompt = Prompt.objects.filter(question_name=name, label_users_see=label)
+        prompt = Prompt.objects.filter(question_name=name, question_placeholder=label)
         if prompt:
             return success_response(
                 self._serializer(prompt[0]).data, status.HTTP_200_OK
             )
 
         # Create and return a new prompt with the given fields
-        prompt = Prompt.objects.create(question_name=name, label_users_see=label)
+        prompt = Prompt.objects.create(question_name=name, question_placeholder=label)
         prompt.save()
         return success_response(self._serializer(prompt).data, status.HTTP_201_CREATED)

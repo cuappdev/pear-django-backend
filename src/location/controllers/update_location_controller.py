@@ -14,7 +14,7 @@ class UpdateLocationController:
     def process(self):
         # Get the model
         location = Location.objects.filter(id=self._id)
-        if location is None:
+        if not location:
             return failure_response(
                 "Location does not exist", status.HTTP_404_NOT_FOUND
             )

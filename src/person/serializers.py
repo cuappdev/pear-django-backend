@@ -89,7 +89,9 @@ class UserSerializer(serializers.ModelSerializer):
                 {
                     "question_id": prompt_questions[question_index].id,
                     "question_name": prompt_questions[question_index].question_name,
-                    "label_users_see": prompt_questions[question_index].label_users_see,
+                    "question_placeholder": prompt_questions[
+                        question_index
+                    ].question_placeholder,
                     "answer": prompt_answers[question_index],
                 }
             )

@@ -9,14 +9,14 @@ class PopulatePromptController:
     def process(self):
         # Check if a prompt already exists with the given fields and return False if so
         prompt = Prompt.objects.filter(
-            question_name=self._name, label_users_see=self._label
+            question_name=self._name, question_placeholder=self._label
         )
         if prompt:
             return False
 
         # Return True after creating a new prompt with the given fields
         prompt = Prompt.objects.create(
-            question_name=self._name, label_users_see=self._label
+            question_name=self._name, question_placeholder=self._label
         )
         prompt.save()
         return True
