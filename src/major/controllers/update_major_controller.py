@@ -14,7 +14,7 @@ class UpdateMajorController:
     def process(self):
         # Get the model
         major = Major.objects.filter(id=self._id)
-        if major is None:
+        if not major:
             return failure_response("Major does not exist", status.HTTP_404_NOT_FOUND)
         major = major[0]
 

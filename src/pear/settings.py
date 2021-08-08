@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "match",
     "person",
     "major",
+    "prompt",
 ]
 
 MIDDLEWARE = [

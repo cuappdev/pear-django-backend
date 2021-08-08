@@ -7,6 +7,7 @@ from interest.controllers.populate_interest_controller import PopulateInterestCo
 from location.controllers.populate_location_controller import PopulateLocationController
 from major.controllers.populate_major_controller import PopulateMajorController
 from pear import settings as pear_settings
+from prompt.controllers.populate_prompt_controller import PopulatePromptController
 from rest_framework import generics
 from rest_framework import status
 
@@ -35,6 +36,7 @@ class PopulateView(generics.GenericAPIView):
             "pear_interests.txt": PopulateInterestController,
             "pear_locations.txt": PopulateLocationController,
             "pear_majors.txt": PopulateMajorController,
+            "pear_prompts.txt": PopulatePromptController,
         }
         return switch.get(filename, None)
 
