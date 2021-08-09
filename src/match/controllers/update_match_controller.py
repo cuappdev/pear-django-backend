@@ -29,7 +29,9 @@ class UpdateMatchController:
 
         # Next, modify the attributes that may have changed:
         # Proposed Meeting Times
-        self._modify_attribute("proposed_meeting_times", proposed_meeting_times)
+        self._modify_attribute(
+            "proposed_meeting_times", json.dumps(proposed_meeting_times)
+        )
         # Meeting Time
         if meeting_time is not None:
             self._update_meeting_time(meeting_time)
@@ -107,13 +109,13 @@ class UpdateMatchController:
         if proposed_meeting_times is not None and proposed_locations is not None:
             self._match.status = match_status.PROPOSED
             self._match.proposer_id = self._user.id
-            self._match.accepted_ids = [self._user.id]
+            self._match.accepted_ids = json.dumps([self._user.id])
         elif meeting_location is not None and meeting_time is not None:
             self._match.status = match_status.ACTIVE
             # use json.loads to convert a string of a list to an actual list
             accepted_ids = json.loads(self._match.accepted_ids)
             if self._user.id not in accepted_ids:
                 accepted_ids.append(self._user.id)
-                self._match.accepted_ids = accepted_ids
+                self._match.accepted_ids = json.dumps(accepted_ids)
             self._match.proposed_meeting_times = None
             self._match.proposed_locations.set([])

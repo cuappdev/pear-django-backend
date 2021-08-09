@@ -14,7 +14,7 @@ class UpdateGroupController:
     def process(self):
         # Get the model
         group = Group.objects.filter(id=self._id)
-        if group is None:
+        if not group:
             return failure_response("Group does not exist", status.HTTP_404_NOT_FOUND)
         group = group[0]
 

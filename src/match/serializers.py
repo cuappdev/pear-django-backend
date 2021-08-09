@@ -34,10 +34,7 @@ class MatchSerializer(serializers.ModelSerializer):
     def get_proposed_meeting_times(self, match):
         if match.proposed_meeting_times is None:
             return None
-        # We have to replace all single quotes with double quotes for JSON
-        proposed_meeting_times = json.loads(
-            match.proposed_meeting_times.replace("'", '"')
-        )
+        proposed_meeting_times = json.loads(match.proposed_meeting_times)
         if proposed_meeting_times == []:
             return None
         return proposed_meeting_times
@@ -96,9 +93,7 @@ class BothUsersMatchSerializer(serializers.ModelSerializer):
     def get_proposed_meeting_times(self, match):
         if match.proposed_meeting_times is None:
             return None
-        proposed_meeting_times = json.loads(
-            match.proposed_meeting_times.replace("'", '"')
-        )
+        proposed_meeting_times = json.loads(match.proposed_meeting_times)
         if proposed_meeting_times == []:
             return None
         return proposed_meeting_times

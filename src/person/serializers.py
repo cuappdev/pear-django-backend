@@ -46,6 +46,7 @@ class UserSerializer(serializers.ModelSerializer):
     locations = LocationSerializer(source="person.locations", many=True)
     interests = InterestSerializer(source="person.interests", many=True)
     groups = GroupSerializer(source="person.groups", many=True)
+    prompts = SerializerMethodField("get_prompts")
     has_onboarded = serializers.BooleanField(source="person.has_onboarded")
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
@@ -53,19 +54,19 @@ class UserSerializer(serializers.ModelSerializer):
     def get_goals(self, user):
         if user.person.goals is None:
             return []
-        goals = json.loads(user.person.goals.replace("'", '"'))
+        goals = json.loads(user.person.goals)
         return goals
 
     def get_talking_points(self, user):
         if user.person.talking_points is None:
             return []
-        talking_points = json.loads(user.person.talking_points.replace("'", '"'))
+        talking_points = json.loads(user.person.talking_points)
         return talking_points
 
     def get_availability(self, user):
         if user.person.availability is None:
             return []
-        availability = json.loads(user.person.availability.replace("'", '"'))
+        availability = json.loads(user.person.availability)
         return availability
 
     def get_current_match(self, user):
@@ -75,6 +76,26 @@ class UserSerializer(serializers.ModelSerializer):
         if len(matches) == 0:
             return None
         return MatchSerializer(matches[0], user=user).data
+
+    def get_prompts(self, user):
+        prompt_questions = user.person.prompt_questions.all()
+        prompt_answers = user.person.prompt_answers
+        if prompt_answers is None:
+            return []
+        prompt_answers = json.loads(prompt_answers)
+        prompts = []
+        for question_index in range(len(prompt_questions)):
+            prompts.append(
+                {
+                    "question_id": prompt_questions[question_index].id,
+                    "question_name": prompt_questions[question_index].question_name,
+                    "question_placeholder": prompt_questions[
+                        question_index
+                    ].question_placeholder,
+                    "answer": prompt_answers[question_index],
+                }
+            )
+        return prompts
 
     class Meta:
         model = User
@@ -96,6 +117,7 @@ class UserSerializer(serializers.ModelSerializer):
             "locations",
             "interests",
             "groups",
+            "prompts",
             "has_onboarded",
             "pending_feedback",
             "current_match",

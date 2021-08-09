@@ -19,24 +19,32 @@ from person.views import AuthenticateView
 from person.views import MeView
 from person.views import UsersView
 from person.views import UserView
+from prompt.views import PromptsView
+from prompt.views import PromptView
 from survey.views import SurveysView
 from survey.views import SurveyView
 
 
 urlpatterns = [
+    # User URLs
     path("authenticate/", AuthenticateView.as_view(), name="authenticate"),
     path("me/", MeView.as_view(), name="me"),
     path("users/", UsersView.as_view(), name="users"),
     path("users/<int:id>/", UserView.as_view(), name="user"),
     path("users/<int:id>/matches/", AllMatchesView.as_view(), name="user_matches"),
+    # Interest URLs
     path("interests/", InterestsView.as_view(), name="interests"),
     path("interests/<int:id>/", InterestView.as_view(), name="interest"),
+    # Group URLs
     path("groups/", GroupsView.as_view(), name="groups"),
     path("groups/<int:id>/", GroupView.as_view(), name="group"),
+    # Location URLs
     path("locations/", LocationsView.as_view(), name="locations"),
     path("locations/<int:id>/", LocationView.as_view(), name="location"),
+    # Major URLs
     path("majors/", MajorsView.as_view(), name="majors"),
     path("majors/<int:id>/", MajorView.as_view(), name="major"),
+    # Match URLs
     path("matches/", MatchesView.as_view(), name="matches"),
     path("matches/<int:id>/", MatchView.as_view(), name="match"),
     path("matches/<int:id>/cancel/", CancelMatchView.as_view(), name="cancel_match"),
@@ -46,8 +54,13 @@ urlpatterns = [
         CancelCurrentMatchView.as_view(),
         name="cancel_current_match",
     ),
+    # Survey URLs
     path("surveys/", SurveysView.as_view(), name="surveys"),
     path("surveys/<int:id>/", SurveyView.as_view(), name="survey"),
+    # Prompt URLs
+    path("prompts/", PromptsView.as_view(), name="prompts"),
+    path("prompts/<int:id>/", PromptView.as_view(), name="prompt"),
+    # Other
     path("populate/", PopulateView.as_view(), name="populate"),
     path("countdown/", CountdownDummyView.as_view(), name="countdown"),
 ]
