@@ -4,6 +4,7 @@ from person.models import Person
 
 
 class Survey(models.Model):
+    did_meet = models.BooleanField(default=None)
     explanation = models.TextField(default=None)
     rating = models.IntegerField(default=None, null=True)
     submitting_user = models.ForeignKey(Person, on_delete=models.SET_NULL, null=True)

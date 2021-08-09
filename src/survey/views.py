@@ -29,7 +29,7 @@ class SurveysView(generics.GenericAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             data = request.data
-        return CreateSurveyController(data, self.serializer_class).process()
+        return CreateSurveyController(data).process()
 
 
 class SurveyView(generics.GenericAPIView):
@@ -51,7 +51,7 @@ class SurveyView(generics.GenericAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             data = request.data
-        return UpdateSurveyController(id, data, self.serializer_class).process()
+        return UpdateSurveyController(id, data).process()
 
     def delete(self, request, id):
         """Delete a survey by id."""
@@ -59,6 +59,4 @@ class SurveyView(generics.GenericAPIView):
         if not survey:
             return failure_response("Survey does not exist", status.HTTP_404_NOT_FOUND)
         survey[0].delete()
-        return success_response(
-            self.serializer_class(survey[0]).data, status.HTTP_200_OK
-        )
+        return success_response(None, status.HTTP_200_OK)

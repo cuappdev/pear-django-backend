@@ -5,11 +5,11 @@ from rest_framework import status
 from survey.models import Survey
 
 
+# TODO(@chalo2000) Convert to celery task
 class UpdateSurveyController:
-    def __init__(self, id, data, serializer):
+    def __init__(self, id, data):
         self._id = id
         self._data = data
-        self._serializer = serializer
 
     def process(self):
         # Get the model
@@ -27,4 +27,4 @@ class UpdateSurveyController:
         modify_attribute(survey, "rating", rating)
 
         survey.save()
-        return success_response(self._serializer(survey).data, status.HTTP_200_OK)
+        return success_response(None, status.HTTP_200_OK)
