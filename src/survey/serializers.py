@@ -5,5 +5,5 @@ from survey.models import Survey
 class SurveySerializer(serializers.ModelSerializer):
     class Meta:
         model = Survey
-        fields = ("id", "explanation", "rating")
+        fields = ("id", "did_meet", "explanation", "rating")
         read_only_fields = fields

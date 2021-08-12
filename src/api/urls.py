@@ -55,8 +55,8 @@ urlpatterns = [
         name="cancel_current_match",
     ),
     # Survey URLs
-    path("surveys/", SurveysView.as_view(), name="surveys"),
-    path("surveys/<int:id>/", SurveyView.as_view(), name="survey"),
+    path("feedback/", SurveysView.as_view(), name="surveys"),
+    path("feedback/<int:id>/", SurveyView.as_view(), name="survey"),
     # Prompt URLs
     path("prompts/", PromptsView.as_view(), name="prompts"),
     path("prompts/<int:id>/", PromptView.as_view(), name="prompt"),

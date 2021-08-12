@@ -29,7 +29,7 @@ class SurveysView(generics.GenericAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             data = request.data
-        return CreateSurveyController(data).process()
+        return CreateSurveyController(request, data).process()
 
 
 class SurveyView(generics.GenericAPIView):
