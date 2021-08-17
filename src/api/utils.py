@@ -28,5 +28,9 @@ def failure_response_with_query(query, message, status=status.HTTP_404_NOT_FOUND
 
 def modify_attribute(model, attr_name, attr_value):
     """Modify an attribute if it isn't None and has been changed."""
-    if attr_value is not None and attr_value != getattr(model, attr_name):
+    if (
+        attr_value is not None
+        and attr_value != "null"
+        and attr_value != getattr(model, attr_name)
+    ):
         setattr(model, attr_name, attr_value)
