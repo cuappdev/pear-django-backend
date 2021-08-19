@@ -80,7 +80,7 @@ class UserSerializer(serializers.ModelSerializer):
         for question_index in range(len(prompt_questions)):
             prompts.append(
                 {
-                    "question_id": prompt_questions[question_index].id,
+                    "id": prompt_questions[question_index].id,
                     "question_name": prompt_questions[question_index].question_name,
                     "question_placeholder": prompt_questions[
                         question_index
