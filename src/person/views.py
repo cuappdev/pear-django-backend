@@ -12,8 +12,8 @@ from .controllers.search_person_controller import SearchPersonController
 from .controllers.update_person_controller import UpdatePersonController
 from .serializers import AllMatchesSerializer
 from .serializers import AuthenticateSerializer
-from .serializers import SimpleUserSerializer
 from .serializers import UserSerializer
+from .simple_serializers import SimpleUserSerializer
 
 
 class AuthenticateView(generics.GenericAPIView):
