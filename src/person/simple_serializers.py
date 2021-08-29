@@ -13,6 +13,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
     majors = MajorSerializer(source="person.majors", many=True)
     hometown = serializers.CharField(source="person.hometown")
     graduation_year = serializers.CharField(source="person.graduation_year")
+    pronouns = serializers.CharField(source="person.pronouns")
     interests = InterestSerializer(source="person.interests", many=True)
     groups = GroupSerializer(source="person.groups", many=True)
 
@@ -27,6 +28,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
             "majors",
             "hometown",
             "graduation_year",
+            "pronouns",
             "interests",
             "groups",
         )
