@@ -30,7 +30,9 @@ class UpdateMatchController:
 
         # Next, modify the attributes that may have changed:
         # Proposed Meeting Times
-        modify_attribute("proposed_meeting_times", json.dumps(proposed_meeting_times))
+        modify_attribute(
+            self._match, "proposed_meeting_times", json.dumps(proposed_meeting_times)
+        )
         # Meeting Time
         if meeting_time is not None:
             self._update_meeting_time(meeting_time)
@@ -50,7 +52,7 @@ class UpdateMatchController:
                 return failure_response(
                     f"Location with id {meeting_location_id} does not exist."
                 )
-            modify_attribute("meeting_location", new_meeting_location[0])
+            modify_attribute(self._match, "meeting_location", new_meeting_location[0])
 
         # Based on what changed, check for status conflicts
         if proposed_meeting_times is not None and proposed_locations is not None:
