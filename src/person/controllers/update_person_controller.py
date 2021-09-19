@@ -86,7 +86,7 @@ class UpdatePersonController:
             prompt_questions = []
             prompt_answers = []
             for prompt in prompts:
-                prompt_id = prompt["question_id"]
+                prompt_id = prompt["id"]
                 prompt_question = Prompt.objects.filter(id=prompt_id)
                 if not prompt_question:
                     return failure_response(f"Prompt id {prompt_id} does not exist.")
