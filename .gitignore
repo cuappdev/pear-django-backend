@@ -133,4 +133,4 @@ dmypy.json
 .pyre/
 
 # Redis
-src/dump.rdb
+dump.rdb
