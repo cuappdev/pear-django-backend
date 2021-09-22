@@ -31,7 +31,7 @@ class UpdatePersonController:
         instagram_username = self._data.get("instagram_username")
         graduation_year = self._data.get("graduation_year")
         pronouns = self._data.get("pronouns")
-        goals = self._data.get("goals")
+        # goals = self._data.get("goals")
         talking_points = self._data.get("talking_points")
         availability = self._data.get("availability")
         location_ids = self._data.get("locations")
@@ -86,7 +86,7 @@ class UpdatePersonController:
             prompt_questions = []
             prompt_answers = []
             for prompt in prompts:
-                prompt_id = prompt["question_id"]
+                prompt_id = prompt["id"]
                 prompt_question = Prompt.objects.filter(id=prompt_id)
                 if not prompt_question:
                     return failure_response(f"Prompt id {prompt_id} does not exist.")
@@ -103,7 +103,7 @@ class UpdatePersonController:
         modify_attribute(self._person, "instagram_username", instagram_username)
         modify_attribute(self._person, "graduation_year", graduation_year)
         modify_attribute(self._person, "pronouns", pronouns)
-        modify_attribute(self._person, "goals", json.dumps(goals))
+        # modify_attribute(self._person, "goals", json.dumps(goals))
         modify_attribute(self._person, "talking_points", json.dumps(talking_points))
         modify_attribute(self._person, "has_onboarded", has_onboarded)
         modify_attribute(self._person, "pending_feedback", pending_feedback)
