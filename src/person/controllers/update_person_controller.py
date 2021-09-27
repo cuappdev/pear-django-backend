@@ -86,12 +86,12 @@ class UpdatePersonController:
             prompt_questions = []
             prompt_answers = []
             for prompt in prompts:
-                prompt_id = prompt["id"]
+                prompt_id = prompt.get("id")
                 prompt_question = Prompt.objects.filter(id=prompt_id)
                 if not prompt_question:
                     return failure_response(f"Prompt id {prompt_id} does not exist.")
                 prompt_questions.append(prompt_question[0])
-                prompt_answers.append(prompt["answer"])
+                prompt_answers.append(prompt.get("answer"))
             self._person.prompt_questions.set(prompt_questions)
             modify_attribute(self._person, "prompt_answers", json.dumps(prompt_answers))
 
