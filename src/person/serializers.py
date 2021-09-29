@@ -8,6 +8,7 @@ from location.serializers import LocationSerializer
 from major.serializers import MajorSerializer
 from match.models import Match
 from match.serializers import MatchSerializer
+from purpose.serializers import PurposeSerializer
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
@@ -41,6 +42,7 @@ class UserSerializer(serializers.ModelSerializer):
     graduation_year = serializers.CharField(source="person.graduation_year")
     pronouns = serializers.CharField(source="person.pronouns")
     # goals = SerializerMethodField("get_goals")
+    purposes = PurposeSerializer(source="person.purposes", many=True)
     availability = SerializerMethodField("get_availability")
     locations = LocationSerializer(source="person.locations", many=True)
     interests = InterestSerializer(source="person.interests", many=True)
@@ -105,6 +107,7 @@ class UserSerializer(serializers.ModelSerializer):
             "graduation_year",
             "pronouns",
             # "goals",
+            "purposes",
             "availability",
             "locations",
             "interests",
