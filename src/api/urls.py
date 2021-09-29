@@ -21,6 +21,8 @@ from person.views import UsersView
 from person.views import UserView
 from prompt.views import PromptsView
 from prompt.views import PromptView
+from purpose.views import PurposesView
+from purpose.views import PurposeView
 from survey.views import SurveysView
 from survey.views import SurveyView
 
@@ -44,6 +46,9 @@ urlpatterns = [
     # Major URLs
     path("majors/", MajorsView.as_view(), name="majors"),
     path("majors/<int:id>/", MajorView.as_view(), name="major"),
+    # Purpose URLs
+    path("purposes/", PurposesView.as_view(), name="purposes"),
+    path("purposes/<int:id>/", PurposeView.as_view(), name="purpose"),
     # Match URLs
     path("matches/", MatchesView.as_view(), name="matches"),
     path("matches/<int:id>/", MatchView.as_view(), name="match"),

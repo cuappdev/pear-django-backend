@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "major",
     "survey",
     "prompt",
+    "purpose",
 ]
 
 MIDDLEWARE = [

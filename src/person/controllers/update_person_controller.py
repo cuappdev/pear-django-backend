@@ -3,11 +3,13 @@ import json
 from api.utils import failure_response
 from api.utils import modify_attribute
 from api.utils import success_response
+from api.utils import update_many_to_many_set
 from group.models import Group
 from interest.models import Interest
 from location.models import Location
 from major.models import Major
 from prompt.models import Prompt
+from purpose.models import Purpose
 from rest_framework import status
 
 from ..tasks import upload_profile_pic
@@ -31,7 +33,7 @@ class UpdatePersonController:
         instagram_username = self._data.get("instagram_username")
         graduation_year = self._data.get("graduation_year")
         pronouns = self._data.get("pronouns")
-        # goals = self._data.get("goals")
+        purpose_ids = self._data.get("purposes")
         talking_points = self._data.get("talking_points")
         availability = self._data.get("availability")
         location_ids = self._data.get("locations")
@@ -41,46 +43,21 @@ class UpdatePersonController:
         has_onboarded = self._data.get("has_onboarded")
         pending_feedback = self._data.get("pending_feedback")
 
-        if major_ids is not None:
-            new_majors = []
-            for id in major_ids:
-                new_major = Major.objects.filter(id=id)
-                if not new_major:
-                    return failure_response(f"Major id {id} does not exist.")
-                new_majors.append(new_major[0])
-            self._person.majors.set(new_majors)
+        many_to_many_sets = [
+            [Purpose, self._person.purposes, purpose_ids],
+            [Major, self._person.majors, major_ids],
+            [Location, self._person.locations, location_ids],
+            [Group, self._person.groups, group_ids],
+            [Interest, self._person.interests, interest_ids],
+        ]
+
+        for (class_name, existing_set, ids) in many_to_many_sets:
+            possible_error = update_many_to_many_set(class_name, existing_set, ids)
+            if possible_error is not None:
+                return possible_error
 
         if profile_pic_base64 is not None:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)
-
-        if location_ids is not None:
-            new_locations = []
-            for loc_id in location_ids:
-                new_location = Location.objects.filter(id=loc_id)
-                if not new_location:
-                    return failure_response(f"Location id {loc_id} does not exist.")
-                new_locations.append(new_location[0])
-            self._person.locations.set(new_locations)
-
-        if group_ids is not None:
-            new_groups = []
-            for group_id in group_ids:
-                new_group = Group.objects.filter(id=group_id)
-                if not new_group:
-                    return failure_response(f"Group id {group_id} does not exist.")
-                new_groups.append(new_group[0])
-            self._person.groups.set(new_groups)
-
-        if interest_ids is not None:
-            new_interests = []
-            for interest_id in interest_ids:
-                new_interest = Interest.objects.filter(id=interest_id)
-                if not new_interest:
-                    return failure_response(
-                        f"Interest id {interest_id} does not exist."
-                    )
-                new_interests.append(new_interest[0])
-            self._person.interests.set(new_interests)
 
         if prompts is not None:
             prompt_questions = []
@@ -103,7 +80,6 @@ class UpdatePersonController:
         modify_attribute(self._person, "instagram_username", instagram_username)
         modify_attribute(self._person, "graduation_year", graduation_year)
         modify_attribute(self._person, "pronouns", pronouns)
-        # modify_attribute(self._person, "goals", json.dumps(goals))
         modify_attribute(self._person, "talking_points", json.dumps(talking_points))
         modify_attribute(self._person, "has_onboarded", has_onboarded)
         modify_attribute(self._person, "pending_feedback", pending_feedback)

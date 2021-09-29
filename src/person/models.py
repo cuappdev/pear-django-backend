@@ -5,6 +5,7 @@ from interest.models import Interest
 from location.models import Location
 from major.models import Major
 from prompt.models import Prompt
+from purpose.models import Purpose
 
 
 class Person(models.Model):
@@ -29,3 +30,4 @@ class Person(models.Model):
     prompt_answers = models.TextField(default=None, null=True)
     has_onboarded = models.BooleanField(default=False)
     pending_feedback = models.BooleanField(default=False)
+    purposes = models.ManyToManyField(Purpose, default=None, blank=True)
