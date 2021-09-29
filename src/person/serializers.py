@@ -41,7 +41,6 @@ class UserSerializer(serializers.ModelSerializer):
     instagram_username = serializers.CharField(source="person.instagram_username")
     graduation_year = serializers.CharField(source="person.graduation_year")
     pronouns = serializers.CharField(source="person.pronouns")
-    # goals = SerializerMethodField("get_goals")
     purposes = PurposeSerializer(source="person.purposes", many=True)
     availability = SerializerMethodField("get_availability")
     locations = LocationSerializer(source="person.locations", many=True)
@@ -51,12 +50,6 @@ class UserSerializer(serializers.ModelSerializer):
     has_onboarded = serializers.BooleanField(source="person.has_onboarded")
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
-
-    # def get_goals(self, user):
-    #     if user.person.goals is None:
-    #         return []
-    #     goals = json.loads(user.person.goals)
-    #     return goals
 
     def get_availability(self, user):
         if user.person.availability is None:
@@ -106,7 +99,6 @@ class UserSerializer(serializers.ModelSerializer):
             "instagram_username",
             "graduation_year",
             "pronouns",
-            # "goals",
             "purposes",
             "availability",
             "locations",

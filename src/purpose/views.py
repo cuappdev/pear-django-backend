@@ -24,7 +24,7 @@ class PurposesView(generics.GenericAPIView):
         )
 
     def post(self, request):
-        """Create an purpose."""
+        """Create a purpose."""
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
@@ -54,7 +54,7 @@ class PurposeView(generics.GenericAPIView):
         return UpdatePurposeController(id, data, self.serializer_class).process()
 
     def delete(self, request, id):
-        """Delete an purpose by id."""
+        """Delete a purpose by id."""
         purpose = Purpose.objects.filter(id=id)
         if not purpose:
             return failure_response("Purpose does not exist", status.HTTP_404_NOT_FOUND)
