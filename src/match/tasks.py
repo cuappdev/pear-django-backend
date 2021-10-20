@@ -1,9 +1,18 @@
 import logging
+import os
+import sys
 
 from celery import Celery
 from celery.signals import after_setup_logger
 from django_celery_beat.models import IntervalSchedule
 from django_celery_beat.models import PeriodicTask
+from main import main
+
+# Get Pear algorithm
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+submodule_path = f"{current_dir}/../../pear-algorithm/src"
+sys.path.insert(0, submodule_path)
 
 app = Celery()
 
@@ -21,18 +30,9 @@ def setup_loggers(logger, *args, **kwargs):
     logger.addHandler(sh)
 
 
-def dummy_scoring_algorithm():
-    logger.warning("running dummy scoring algo")
-
-
-def dummy_matching_algorithm():
-    logger.warning("running dummy matching algo")
-
-
 @app.task
 def matcher():
-    dummy_scoring_algorithm()
-    dummy_matching_algorithm()
+    main(logger)
 
 
 schedule, _ = IntervalSchedule.objects.get_or_create(
@@ -42,6 +42,6 @@ schedule, _ = IntervalSchedule.objects.get_or_create(
 
 PeriodicTask.objects.get_or_create(
     interval=schedule,
-    name="Matching Algorithm",
+    name="Pear Algorithm",
     task="match.tasks.matcher",
 )
