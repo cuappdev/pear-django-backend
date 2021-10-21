@@ -9,7 +9,7 @@ from purpose.models import Purpose
 
 
 class Person(models.Model):
-    net_id = models.CharField(max_length=10)
+    net_id = models.CharField(max_length=15)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, unique=True, default=None
     )
