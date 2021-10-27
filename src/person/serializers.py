@@ -50,6 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
     has_onboarded = serializers.BooleanField(source="person.has_onboarded")
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
+    deleted = serializers.BooleanField(source="person.soft_deleted")
 
     def get_availability(self, user):
         if user.person.availability is None:
@@ -106,6 +107,7 @@ class UserSerializer(serializers.ModelSerializer):
             "groups",
             "prompts",
             "has_onboarded",
+            "deleted",
             "pending_feedback",
             "current_match",
         )

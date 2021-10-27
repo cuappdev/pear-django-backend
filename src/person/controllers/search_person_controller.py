@@ -2,6 +2,7 @@ from api.utils import failure_response
 from api.utils import success_response
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.db.models import Q
 from rapidfuzz import process as fuzzymatch
 from rest_framework import status
 
@@ -12,7 +13,9 @@ class SearchPersonController:
         self._serializer = serializer
 
     def process(self):
-        users = User.objects.filter(person__has_onboarded=True)
+        users = User.objects.filter(
+            Q(person__has_onboarded=True) & Q(person__soft_deleted=False)
+        )
         query = self._data.get("query")
         # Check if query was provided and isn't whitespace
         if query is not None and query.strip() != "":

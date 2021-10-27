@@ -43,6 +43,7 @@ class UpdatePersonController:
         interest_ids = self._data.get("interests")
         has_onboarded = self._data.get("has_onboarded")
         pending_feedback = self._data.get("pending_feedback")
+        deleted = self._data.get("deleted")
 
         many_to_many_sets = [
             [Purpose, self._person.purposes, purpose_ids],
@@ -86,6 +87,7 @@ class UpdatePersonController:
         modify_attribute(self._person, "pending_feedback", pending_feedback)
         modify_attribute(self._person, "availability", json.dumps(availability))
         modify_attribute(self._person, "profile_pic_url", profile_pic_url)
+        modify_attribute(self._person, "soft_deleted", deleted)
         self._user.save()
         self._person.save()
         return success_response(status=status.HTTP_200_OK)
