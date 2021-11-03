@@ -71,6 +71,27 @@ class UsersView(generics.GenericAPIView):
         return SearchPersonController(request.GET, self.serializer_class).process()
 
 
+class SuperUserUpdateView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.SUPER_USER_PERMISSIONS
+
+    def post(self, request, id):
+        """Update user by id."""
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            data = request.data
+        user = User.objects.filter(id=id)
+        return UpdatePersonController(user, data, self.serializer_class).process()
+
+    def delete(self, request, id):
+        """Delete user by id."""
+        user = User.objects.filter(id=id)
+        if not user:
+            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        user.delete()
+
+
 class AllMatchesView(generics.GenericAPIView):
     serializer_class = AllMatchesSerializer
 

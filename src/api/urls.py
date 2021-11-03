@@ -17,6 +17,7 @@ from match.views import MatchView
 from person.views import AllMatchesView
 from person.views import AuthenticateView
 from person.views import MeView
+from person.views import SuperUserUpdateView
 from person.views import UsersView
 from person.views import UserView
 from prompt.views import PromptsView
@@ -62,6 +63,12 @@ urlpatterns = [
     # Survey URLs
     path("feedback/", SurveysView.as_view(), name="surveys"),
     path("feedback/<int:id>/", SurveyView.as_view(), name="survey"),
+    # Superuser URLs
+    path(
+        "superuser/users/<int:id>/",
+        SuperUserUpdateView.as_view(),
+        name="superuser_update_user",
+    ),
     # Prompt URLs
     path("prompts/", PromptsView.as_view(), name="prompts"),
     path("prompts/<int:id>/", PromptView.as_view(), name="prompt"),
