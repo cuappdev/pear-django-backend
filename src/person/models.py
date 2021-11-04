@@ -31,3 +31,4 @@ class Person(models.Model):
     has_onboarded = models.BooleanField(default=False)
     pending_feedback = models.BooleanField(default=False)
     purposes = models.ManyToManyField(Purpose, default=None, blank=True)
+    soft_deleted = models.BooleanField(default=False)

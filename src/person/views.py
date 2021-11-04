@@ -49,6 +49,13 @@ class MeView(generics.GenericAPIView):
             request.user, data, self.serializer_class
         ).process()
 
+    def delete(self, request):
+        """Soft-delete current authenticated user."""
+        data = {"deleted": True}
+        return UpdatePersonController(
+            request.user, data, self.serializer_class
+        ).process()
+
 
 class UserView(generics.GenericAPIView):
     serializer_class = UserSerializer
