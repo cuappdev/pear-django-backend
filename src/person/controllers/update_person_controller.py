@@ -62,15 +62,26 @@ class UpdatePersonController:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)
 
         if prompts is not None:
-            prompt_questions = []
-            prompt_answers = []
+            prompts_sorted = []
+
+            # Check that prompts are valid and add them to the list to sort
             for prompt in prompts:
                 prompt_id = prompt.get("id")
                 prompt_question = Prompt.objects.filter(id=prompt_id)
                 if not prompt_question:
                     return failure_response(f"Prompt id {prompt_id} does not exist.")
-                prompt_questions.append(prompt_question[0])
-                prompt_answers.append(prompt.get("answer"))
+                prompts_sorted.append([prompt_id, prompt.get("answer")])
+
+            # Sort prompts by id to ensure Django doesn't mess it up
+            prompts_sorted.sort(key=lambda prompt: prompt[0])
+
+            prompt_questions = []
+            prompt_answers = []
+            # Now, iterate through prompts_sorted and add the prompts to the person
+            for prompt_id, prompt_answer in prompts_sorted:
+                prompt_questions.append(prompt_id)
+                prompt_answers.append(prompt_answer)
+
             self._person.prompt_questions.set(prompt_questions)
             modify_attribute(self._person, "prompt_answers", json.dumps(prompt_answers))
 
