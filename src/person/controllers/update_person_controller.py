@@ -64,7 +64,6 @@ class UpdatePersonController:
         if prompts is not None:
             # Sort prompts by id to ensure Django doesn't change the order
             prompts.sort(key=lambda prompt: prompt.get("id"))
-            print(prompts)
 
             prompt_questions = []
             prompt_answers = []
