@@ -21,7 +21,10 @@ class MatchesView(generics.GenericAPIView):
 
     def get(self, request):
         """Get all matches."""
-        matches = Match.objects.all().order_by("-created_date")
+        user = request.user
+        matches = Match.objects.filter(Q(user_1=user) | Q(user_2=user)).order_by(
+            "-created_date"
+        )
         return success_response(self.serializer_class(matches, many=True).data)
 
     def post(self, request):
