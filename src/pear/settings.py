@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework.authtoken",
+    "push_notifications",
     "group",
     "interest",
     "location",
@@ -52,6 +53,10 @@ INSTALLED_APPS = [
     "prompt",
     "purpose",
 ]
+
+PUSH_NOTIFICATIONS_SETTINGS = {
+    "FCM_API_KEY": os.getenv("FCM_API_KEY"),
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

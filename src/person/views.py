@@ -9,6 +9,7 @@ from rest_framework import status
 
 from .controllers.authenticate_controller import AuthenticateController
 from .controllers.search_person_controller import SearchPersonController
+from .controllers.send_message_controller import SendMessageController
 from .controllers.update_person_controller import UpdatePersonController
 from .serializers import AllMatchesSerializer
 from .serializers import AuthenticateSerializer
@@ -87,3 +88,9 @@ class AllMatchesView(generics.GenericAPIView):
         if not user:
             return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
         return success_response(self.serializer_class(user[0]).data, status.HTTP_200_OK)
+
+
+class SendMessageView(generics.GenericAPIView):
+    def post(self, request, id):
+        """Send push notification to user by user id."""
+        return SendMessageController(request.user, request.data, id).process()
