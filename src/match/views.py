@@ -36,6 +36,37 @@ class MatchesView(generics.GenericAPIView):
         return CreateMatchController(data, self.serializer_class).process()
 
 
+class MultipleMatchesView(generics.GenericAPIView):
+    serializer_class = BothUsersMatchSerializer
+    permission_classes = api_settings.ADMIN_PERMISSIONS
+
+    def post(self, request):
+        """Create multiple matches."""
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            data = request.data
+        match_ids_list = data.get("matches")
+        if not match_ids_list:
+            return failure_response(
+                "POST body is misformatted", status=status.HTTP_400_BAD_REQUEST
+            )
+        print(match_ids_list)
+        for match_ids in match_ids_list:
+            print(match_ids)
+            new_match_response = CreateMatchController(
+                {"ids": match_ids}, self.serializer_class
+            ).process()
+            print(new_match_response)
+            if new_match_response.status_code not in [
+                status.HTTP_201_CREATED,
+                status.HTTP_200_OK,
+            ]:
+                # if match creation fails, return the failure response
+                return new_match_response
+        return success_response(status=status.HTTP_201_CREATED)
+
+
 class MatchView(generics.GenericAPIView):
     serializer_class = BothUsersMatchSerializer
     permission_classes = api_settings.CONSUMER_PERMISSIONS
