@@ -51,13 +51,10 @@ class MultipleMatchesView(generics.GenericAPIView):
             return failure_response(
                 "POST body is misformatted", status=status.HTTP_400_BAD_REQUEST
             )
-        print(match_ids_list)
         for match_ids in match_ids_list:
-            print(match_ids)
             new_match_response = CreateMatchController(
                 {"ids": match_ids}, self.serializer_class
             ).process()
-            print(new_match_response)
             if new_match_response.status_code not in [
                 status.HTTP_201_CREATED,
                 status.HTTP_200_OK,
