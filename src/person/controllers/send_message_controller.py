@@ -29,13 +29,10 @@ class SendMessageController:
             registration_id=receiving_user.person.fcm_registration_token
         )
         response = device.send_message(
-            message={
-                "title": f"Chat from {self._user.first_name}",
-                # Max length of notif is 110 characters
-                "body": message[0:110],
-            },
+            title=f"Chat from {self._user.first_name}",
+            message=message,
             # Give APNS user id as thread id so iOS can collapse notifications
-            thread_id=self._user.id,
+            thread_id=str(self._user.id),
             # Set the app to have a badge
             badge=1,
         )
