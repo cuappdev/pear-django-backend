@@ -82,12 +82,13 @@ class UpdatePersonController:
             self._person.prompt_questions.set(prompt_questions)
             modify_attribute(self._person, "prompt_answers", json.dumps(prompt_answers))
 
-        print(fcm_registration_token)
-        print(self._person.fcm_registration_token)
         if (
             fcm_registration_token is not None
             and self._person.fcm_registration_token != fcm_registration_token
         ):
+            GCMDevice.objects.filter(
+                registration_id=self._person.fcm_registration_token
+            ).delete()
             self._person.fcm_registration_token = fcm_registration_token
             fcm_device = GCMDevice.objects.create(
                 registration_id=fcm_registration_token,

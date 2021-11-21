@@ -23,7 +23,7 @@ class SendMessageController:
             )
         receiving_user = receiving_user[0]
         if not receiving_user.person.fcm_registration_token:
-            # Receiving user does not have notifications enabled, but we don't want to block
+            # Receiving user does not have notifications enabled, but message will still be delivered through Firebase
             return success_response(status=status.HTTP_200_OK)
         device = GCMDevice.objects.get(
             registration_id=receiving_user.person.fcm_registration_token
