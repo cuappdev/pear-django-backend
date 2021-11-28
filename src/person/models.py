@@ -32,3 +32,4 @@ class Person(models.Model):
     pending_feedback = models.BooleanField(default=False)
     purposes = models.ManyToManyField(Purpose, default=None, blank=True)
     soft_deleted = models.BooleanField(default=False)
+    fcm_registration_token = models.TextField(default=None, null=True)

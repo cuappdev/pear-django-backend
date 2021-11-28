@@ -10,6 +10,7 @@ from location.models import Location
 from major.models import Major
 from prompt.models import Prompt
 from purpose.models import Purpose
+from push_notifications.models import GCMDevice
 from rest_framework import status
 
 from ..tasks import upload_profile_pic
@@ -44,6 +45,7 @@ class UpdatePersonController:
         has_onboarded = self._data.get("has_onboarded")
         pending_feedback = self._data.get("pending_feedback")
         deleted = self._data.get("deleted")
+        fcm_registration_token = self._data.get("fcm_registration_token")
 
         many_to_many_sets = [
             [Purpose, self._person.purposes, purpose_ids],
@@ -79,6 +81,21 @@ class UpdatePersonController:
 
             self._person.prompt_questions.set(prompt_questions)
             modify_attribute(self._person, "prompt_answers", json.dumps(prompt_answers))
+
+        if (
+            fcm_registration_token is not None
+            and self._person.fcm_registration_token != fcm_registration_token
+        ):
+            GCMDevice.objects.filter(
+                registration_id=self._person.fcm_registration_token
+            ).delete()
+            self._person.fcm_registration_token = fcm_registration_token
+            fcm_device = GCMDevice.objects.create(
+                registration_id=fcm_registration_token,
+                cloud_message_type="FCM",
+                user=self._user,
+            )
+            self._user.fcm_device = fcm_device
 
         modify_attribute(self._person, "net_id", net_id)
         modify_attribute(self._user, "first_name", first_name)
