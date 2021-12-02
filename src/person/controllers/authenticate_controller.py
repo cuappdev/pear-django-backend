@@ -1,5 +1,3 @@
-import os
-
 from api import settings as api_settings
 from api.utils import failure_response
 from api.utils import success_response
@@ -19,6 +17,17 @@ class AuthenticateController:
         self._request = request
         self._data = data
         self._serializer = serializer
+
+    def _authenticate(self, username, password):
+        authenticated_user = authenticate(
+            self._request, username=username, password=password
+        )
+        if authenticated_user is None:
+            # Google User ID doesn't correspond to net_id
+            # Could result from debugging mistake or malicious activity...
+            return None, status.HTTP_403_FORBIDDEN
+        django_login(self._request, authenticated_user)
+        return authenticated_user, status.HTTP_200_OK
 
     def _issue_access_token(self, user):
         """Returns a new access token for `user` if expired; otherwise, returns the original access token."""
@@ -41,7 +50,7 @@ class AuthenticateController:
 
     def _get_token_info(self, token):
         """Returns token information if `token` is valid. If in `DEBUG` mode, returns the request data."""
-        if not os.getenv("DEBUG", False):
+        if not api_settings.GOOGLE_DEBUG:
             try:
                 return id_token.verify_oauth2_token(token, requests.Request())
             except ValueError:
@@ -64,7 +73,13 @@ class AuthenticateController:
         logs an existing user in or registers a new one."""
         user = self._request.user
         status_code = status.HTTP_200_OK
-        if not user.is_authenticated:
+        if self._data.get("username") and self._data.get("password"):
+            user, status_code = self._authenticate(
+                self._data.get("username"), self._data.get("password")
+            )
+            if user is None:
+                return failure_response("Bad credentials provided.", status=status_code)
+        elif not user.is_authenticated:
             token = self._data.get("id_token")
             token_info = self._get_token_info(token)
             if token_info is None:
@@ -87,17 +102,10 @@ class AuthenticateController:
         person_exists = Person.objects.filter(net_id=net_id)
         if not person_exists:
             self._register(token_info)
-        authenticated_user = authenticate(
-            self._request, username=username, password=password
-        )
-        if authenticated_user is None:
-            # Google User ID doesn't correspond to net_id
-            # Could result from debugging mistake or malicious activity...
-            return None, status.HTTP_403_FORBIDDEN
-        django_login(self._request, authenticated_user)
+        authenticated_user, auth_status = self._authenticate(username, password)
         return (
             authenticated_user,
-            status.HTTP_201_CREATED if not person_exists else status.HTTP_200_OK,
+            status.HTTP_201_CREATED if not person_exists else auth_status,
         )
 
     def _register(self, token_info):
@@ -121,5 +129,6 @@ class AuthenticateController:
             "user": user,
             "net_id": net_id,
             "profile_pic_url": profile_pic_url,
+            "has_onboarded": False,
         }
         self._create_person(person_data)

@@ -14,7 +14,7 @@ class UpdateInterestController:
     def process(self):
         # Get the model
         interest = Interest.objects.filter(id=self._id)
-        if interest is None:
+        if not interest:
             return failure_response(
                 "Interest does not exist", status.HTTP_404_NOT_FOUND
             )

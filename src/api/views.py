@@ -5,7 +5,10 @@ from api.utils import success_response
 from group.controllers.populate_group_controller import PopulateGroupController
 from interest.controllers.populate_interest_controller import PopulateInterestController
 from location.controllers.populate_location_controller import PopulateLocationController
+from major.controllers.populate_major_controller import PopulateMajorController
 from pear import settings as pear_settings
+from prompt.controllers.populate_prompt_controller import PopulatePromptController
+from purpose.controllers.populate_purpose_controller import PopulatePurposeController
 from rest_framework import generics
 from rest_framework import status
 
@@ -33,6 +36,9 @@ class PopulateView(generics.GenericAPIView):
             "pear_groups.txt": PopulateGroupController,
             "pear_interests.txt": PopulateInterestController,
             "pear_locations.txt": PopulateLocationController,
+            "pear_majors.txt": PopulateMajorController,
+            "pear_prompts.txt": PopulatePromptController,
+            "pear_purposes.txt": PopulatePurposeController,
         }
         return switch.get(filename, None)
 

@@ -1,14 +1,20 @@
 import json
 
 from api import settings as api_settings
+from api.utils import failure_response
 from api.utils import success_response
+from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework import status
 
 from .controllers.authenticate_controller import AuthenticateController
+from .controllers.search_person_controller import SearchPersonController
+from .controllers.send_message_controller import SendMessageController
 from .controllers.update_person_controller import UpdatePersonController
+from .serializers import AllMatchesSerializer
 from .serializers import AuthenticateSerializer
 from .serializers import UserSerializer
+from .simple_serializers import SimpleUserSerializer
 
 
 class AuthenticateView(generics.GenericAPIView):
@@ -40,4 +46,51 @@ class MeView(generics.GenericAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             data = request.data
-        return UpdatePersonController(request, data, self.serializer_class).process()
+        return UpdatePersonController(
+            request.user, data, self.serializer_class
+        ).process()
+
+    def delete(self, request):
+        """Soft-delete current authenticated user."""
+        data = {"deleted": True}
+        return UpdatePersonController(
+            request.user, data, self.serializer_class
+        ).process()
+
+
+class UserView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def get(self, request, id):
+        """Get user by id."""
+        user = User.objects.filter(id=id)
+        if not user:
+            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        return success_response(self.serializer_class(user[0]).data, status.HTTP_200_OK)
+
+
+class UsersView(generics.GenericAPIView):
+    serializer_class = SimpleUserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def get(self, request):
+        """Get users requested with search query."""
+        return SearchPersonController(request.GET, self.serializer_class).process()
+
+
+class AllMatchesView(generics.GenericAPIView):
+    serializer_class = AllMatchesSerializer
+
+    def get(self, request, id):
+        """Get all matches for user by user id."""
+        user = User.objects.filter(id=id)
+        if not user:
+            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        return success_response(self.serializer_class(user[0]).data, status.HTTP_200_OK)
+
+
+class SendMessageView(generics.GenericAPIView):
+    def post(self, request, id):
+        """Send push notification to user by user id."""
+        return SendMessageController(request.user, request.data, id).process()

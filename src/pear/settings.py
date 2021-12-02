@@ -20,10 +20,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG")
+DEBUG = os.getenv("DJANGO_DEBUG") == "True"
 
 SQLITE3 = os.getenv("SQLITE3") == "True"
 
@@ -42,11 +42,21 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework.authtoken",
+    "push_notifications",
     "group",
     "interest",
     "location",
+    "match",
     "person",
+    "major",
+    "survey",
+    "prompt",
+    "purpose",
 ]
+
+PUSH_NOTIFICATIONS_SETTINGS = {
+    "FCM_API_KEY": os.getenv("FCM_API_KEY"),
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -160,5 +170,9 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
 # File parsing constants
-ASSETS_LOCATION = "../assets/"
+ASSETS_LOCATION = "assets/"
 ASSETS_SPLITTER = "|"
+
+# Other constants
+IMAGE_HOST_BASE = os.getenv("IMAGE_HOST_BASE")
+DEFAULT_GROUP_IMAGE_TAG = "esictb6y.png"
