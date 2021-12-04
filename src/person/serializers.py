@@ -51,6 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
     deleted = serializers.BooleanField(source="person.soft_deleted")
+    matching_paused = serializers.BooleanField(source="person.matching_paused")
 
     def get_availability(self, user):
         if user.person.availability is None:
@@ -110,6 +111,7 @@ class UserSerializer(serializers.ModelSerializer):
             "deleted",
             "pending_feedback",
             "current_match",
+            "matching_paused",
         )
         read_only_fields = fields
 

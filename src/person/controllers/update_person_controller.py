@@ -46,6 +46,7 @@ class UpdatePersonController:
         pending_feedback = self._data.get("pending_feedback")
         deleted = self._data.get("deleted")
         fcm_registration_token = self._data.get("fcm_registration_token")
+        matching_paused = self._data.get("matching_paused")
 
         many_to_many_sets = [
             [Purpose, self._person.purposes, purpose_ids],
@@ -111,6 +112,7 @@ class UpdatePersonController:
         modify_attribute(self._person, "availability", json.dumps(availability))
         modify_attribute(self._person, "profile_pic_url", profile_pic_url)
         modify_attribute(self._person, "soft_deleted", deleted)
+        modify_attribute(self._person, "matching_paused", matching_paused)
         self._user.save()
         self._person.save()
         return success_response(status=status.HTTP_200_OK)
