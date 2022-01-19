@@ -5,10 +5,11 @@ from interest.models import Interest
 from location.models import Location
 from major.models import Major
 from prompt.models import Prompt
+from purpose.models import Purpose
 
 
 class Person(models.Model):
-    net_id = models.CharField(max_length=10)
+    net_id = models.CharField(max_length=15)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, unique=True, default=None
     )
@@ -17,7 +18,7 @@ class Person(models.Model):
     profile_pic_url = models.CharField(max_length=100, default=None, null=True)
     facebook_url = models.CharField(max_length=100, default=None, null=True)
     instagram_username = models.CharField(max_length=30, default=None, null=True)
-    graduation_year = models.CharField(max_length=4, default=None, null=True)
+    graduation_year = models.CharField(max_length=20, default=None, null=True)
     pronouns = models.CharField(max_length=20, default=None, null=True)
     goals = models.TextField(default=None, null=True)
     talking_points = models.TextField(default=None, null=True)
@@ -29,3 +30,6 @@ class Person(models.Model):
     prompt_answers = models.TextField(default=None, null=True)
     has_onboarded = models.BooleanField(default=False)
     pending_feedback = models.BooleanField(default=False)
+    purposes = models.ManyToManyField(Purpose, default=None, blank=True)
+    soft_deleted = models.BooleanField(default=False)
+    fcm_registration_token = models.TextField(default=None, null=True)

@@ -8,6 +8,7 @@ from location.serializers import LocationSerializer
 from major.serializers import MajorSerializer
 from match.models import Match
 from match.serializers import MatchSerializer
+from purpose.serializers import PurposeSerializer
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
@@ -40,8 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
     instagram_username = serializers.CharField(source="person.instagram_username")
     graduation_year = serializers.CharField(source="person.graduation_year")
     pronouns = serializers.CharField(source="person.pronouns")
-    goals = SerializerMethodField("get_goals")
-    talking_points = SerializerMethodField("get_talking_points")
+    purposes = PurposeSerializer(source="person.purposes", many=True)
     availability = SerializerMethodField("get_availability")
     locations = LocationSerializer(source="person.locations", many=True)
     interests = InterestSerializer(source="person.interests", many=True)
@@ -50,18 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
     has_onboarded = serializers.BooleanField(source="person.has_onboarded")
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
-
-    def get_goals(self, user):
-        if user.person.goals is None:
-            return []
-        goals = json.loads(user.person.goals)
-        return goals
-
-    def get_talking_points(self, user):
-        if user.person.talking_points is None:
-            return []
-        talking_points = json.loads(user.person.talking_points)
-        return talking_points
+    deleted = serializers.BooleanField(source="person.soft_deleted")
 
     def get_availability(self, user):
         if user.person.availability is None:
@@ -87,7 +76,7 @@ class UserSerializer(serializers.ModelSerializer):
         for question_index in range(len(prompt_questions)):
             prompts.append(
                 {
-                    "question_id": prompt_questions[question_index].id,
+                    "id": prompt_questions[question_index].id,
                     "question_name": prompt_questions[question_index].question_name,
                     "question_placeholder": prompt_questions[
                         question_index
@@ -111,44 +100,16 @@ class UserSerializer(serializers.ModelSerializer):
             "instagram_username",
             "graduation_year",
             "pronouns",
-            "goals",
-            "talking_points",
+            "purposes",
             "availability",
             "locations",
             "interests",
             "groups",
             "prompts",
             "has_onboarded",
+            "deleted",
             "pending_feedback",
             "current_match",
-        )
-        read_only_fields = fields
-
-
-class SimpleUserSerializer(serializers.ModelSerializer):
-    """Serializer for all users view."""
-
-    net_id = serializers.CharField(source="person.net_id")
-    profile_pic_url = serializers.CharField(source="person.profile_pic_url")
-    majors = MajorSerializer(source="person.majors", many=True)
-    hometown = serializers.CharField(source="person.hometown")
-    graduation_year = serializers.CharField(source="person.graduation_year")
-    interests = InterestSerializer(source="person.interests", many=True)
-    groups = GroupSerializer(source="person.groups", many=True)
-
-    class Meta:
-        model = User
-        fields = (
-            "id",
-            "net_id",
-            "first_name",
-            "last_name",
-            "profile_pic_url",
-            "majors",
-            "hometown",
-            "graduation_year",
-            "interests",
-            "groups",
         )
         read_only_fields = fields
 

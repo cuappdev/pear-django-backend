@@ -2,7 +2,7 @@ import json
 
 from location.serializers import LocationSerializer
 from match.models import Match
-from person.simple_serializers import MatchUserSerializer
+from person.simple_serializers import SimpleUserSerializer
 from rest_framework import serializers
 
 
@@ -21,9 +21,9 @@ class MatchSerializer(serializers.ModelSerializer):
 
     def get_matched_user(self, match):
         if self.request_user == match.user_1:
-            return MatchUserSerializer(match.user_2).data
+            return SimpleUserSerializer(match.user_2).data
         elif self.request_user == match.user_2:
-            return MatchUserSerializer(match.user_1).data
+            return SimpleUserSerializer(match.user_1).data
 
     def get_accepted_ids(self, match):
         if match.accepted_ids is None:
@@ -79,7 +79,7 @@ class BothUsersMatchSerializer(serializers.ModelSerializer):
     meeting_location = serializers.SerializerMethodField("get_meeting_location")
 
     def get_users(self, match):
-        serializer = MatchUserSerializer(data=[match.user_1, match.user_2], many=True)
+        serializer = SimpleUserSerializer(data=[match.user_1, match.user_2], many=True)
         # because data is passed w/ multiple users, check validity before returning
         serializer.is_valid()
         return serializer.data

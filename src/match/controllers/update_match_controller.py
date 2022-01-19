@@ -2,6 +2,7 @@ import datetime
 import json
 
 from api.utils import failure_response
+from api.utils import modify_attribute
 from api.utils import success_response
 from location.models import Location
 from match import match_status
@@ -29,8 +30,8 @@ class UpdateMatchController:
 
         # Next, modify the attributes that may have changed:
         # Proposed Meeting Times
-        self._modify_attribute(
-            "proposed_meeting_times", json.dumps(proposed_meeting_times)
+        modify_attribute(
+            self._match, "proposed_meeting_times", json.dumps(proposed_meeting_times)
         )
         # Meeting Time
         if meeting_time is not None:
@@ -51,7 +52,7 @@ class UpdateMatchController:
                 return failure_response(
                     f"Location with id {meeting_location_id} does not exist."
                 )
-            self._modify_attribute("meeting_location", new_meeting_location[0])
+            modify_attribute(self._match, "meeting_location", new_meeting_location[0])
 
         # Based on what changed, check for status conflicts
         if proposed_meeting_times is not None and proposed_locations is not None:
@@ -77,11 +78,6 @@ class UpdateMatchController:
 
         self._match.save()
         return success_response()
-
-    def _modify_attribute(self, attr_name, attr_value):
-        """Modify an attribute if it isn't None and has been changed."""
-        if attr_value is not None and attr_value != getattr(self._match, attr_name):
-            setattr(self._match, attr_name, attr_value)
 
     def _update_meeting_time(self, times):
         """Given a list with one time, generate a timestamp.
