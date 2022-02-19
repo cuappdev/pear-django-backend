@@ -16,22 +16,28 @@ class CreateMatchController:
         match_ids = self._data.get("ids")
         if match_ids is None:
             error_msg = "POST body is misformatted"
-            return False, error_msg if self._return_status else failure_response(
-                error_msg, status.HTTP_400_BAD_REQUEST
+            return (
+                (False, error_msg)
+                if self._return_status
+                else failure_response(error_msg, status.HTTP_400_BAD_REQUEST)
             )
         # Always set user_1 to the lower user id
         user_1 = User.objects.filter(id=min(match_ids))
         if not user_1:
             error_msg = f"User with id {min(match_ids)} does not exist"
-            return False, error_msg if self._return_status else failure_response(
-                error_msg
+            return (
+                (False, error_msg)
+                if self._return_status
+                else failure_response(error_msg)
             )
         # Always set user_2 to the higher user id
         user_2 = User.objects.filter(id=max(match_ids))
         if not user_2:
             error_msg = f"User with id {max(match_ids)} does not exist"
-            return False, error_msg if self._return_status else failure_response(
-                error_msg
+            return (
+                (False, error_msg)
+                if self._return_status
+                else failure_response(error_msg)
             )
         user_1 = user_1[0]
         user_2 = user_2[0]
@@ -39,8 +45,10 @@ class CreateMatchController:
             user_1=user_1, user_2=user_2, status=match_status.CREATED
         )
         if possible_match:
-            return True, "" if self._return_status else success_response(
-                None, status.HTTP_200_OK
+            return (
+                (True, "")
+                if self._return_status
+                else success_response(None, status.HTTP_200_OK)
             )
         match = Match.objects.create(
             status=match_status.CREATED,
@@ -51,6 +59,10 @@ class CreateMatchController:
         )
         match.proposed_locations.set([])
         match.save()
-        return True, "" if self._return_status else success_response(
-            None, status.HTTP_201_CREATED
+        user_1.person.pending_feedback = True
+        user_2.person.pending_feedback = True
+        return (
+            (True, "")
+            if self._return_status
+            else success_response(None, status.HTTP_201_CREATED)
         )

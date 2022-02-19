@@ -33,7 +33,9 @@ class MatchesView(generics.GenericAPIView):
             data = json.loads(request.body)
         except json.JSONDecodeError:
             data = request.data
-        return CreateMatchController(data, self.serializer_class).process()
+        result = CreateMatchController(data, self.serializer_class).process()
+        print(result)
+        return result
 
 
 class MultipleMatchesView(generics.GenericAPIView):
