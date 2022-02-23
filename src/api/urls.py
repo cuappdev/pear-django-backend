@@ -65,7 +65,7 @@ urlpatterns = [
         name="cancel_current_match",
     ),
     # Survey/Feedback URLs
-    path("feedback/", AllSurveysView.as_view(), name="surveys"),
+    path("matches/feedback/", AllSurveysView.as_view(), name="surveys"),
     path(
         "matches/<int:match_id>/feedback/", SurveysView.as_view(), name="match_surveys"
     ),

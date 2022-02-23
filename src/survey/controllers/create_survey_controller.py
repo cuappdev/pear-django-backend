@@ -44,7 +44,9 @@ class CreateSurveyController:
                     status.HTTP_400_BAD_REQUEST,
                 )
             if not all(
-                map(lambda x: x in constants.DID_NOT_MEET_LONG, did_not_meet_reasons)
+                map(
+                    lambda x: x in constants.DID_NOT_MEET.values(), did_not_meet_reasons
+                )
             ):
                 return failure_response(
                     "did_not_meet_reasons has invalid elements",
@@ -52,7 +54,7 @@ class CreateSurveyController:
                 )
 
             did_not_meet_reasons = list(
-                map(lambda x: constants.long_to_short(x), did_not_meet_reasons)
+                map(lambda x: constants.DID_NOT_MEET_REV[x], did_not_meet_reasons)
             )
             if len(did_not_meet_reasons) > 5:
                 return failure_response(
@@ -67,9 +69,8 @@ class CreateSurveyController:
         completed_match = completed_match[0]
 
         # Check if the submitting user has already submitted a survey
-        submitting_person = self._request.user.person
         survey = Survey.objects.filter(
-            submitting_person=submitting_person, completed_match=completed_match
+            submitting_person=self._request.user.person, completed_match=completed_match
         )
         if survey:
             return failure_response(
@@ -95,10 +96,10 @@ class CreateSurveyController:
             if not did_meet
             else None,
             rating=rating,
-            submitting_person=submitting_person,
+            submitting_person=self._request.user.person,
             completed_match=completed_match,
         )
-        submitting_person.pending_feedback = False
+        self._request.user.person.pending_feedback = False
         survey.save()
-        submitting_person.save()
+        self._request.user.person.save()
         return success_response(None, status.HTTP_201_CREATED)

@@ -14,7 +14,7 @@ class SurveySerializer(serializers.ModelSerializer):
         if survey.did_not_meet_reasons is None:
             return []
         return map(
-            lambda x: constants.short_to_long(x),
+            lambda x: constants.DID_NOT_MEET[x],
             json.loads(survey.did_not_meet_reasons),
         )
 

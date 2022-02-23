@@ -14,8 +14,7 @@ from .serializers import SurveySerializer
 
 class AllSurveysView(generics.GenericAPIView):
     serializer_class = SurveySerializer
-    # TODO @njs99: figure out the best way to limit this to superusers
-    permission_classes = api_settings.CONSUMER_PERMISSIONS
+    permission_classes = api_settings.ADMIN_PERMISSIONS
 
     def get(self, request):
         """Get all surveys."""
@@ -59,11 +58,11 @@ class SurveyView(generics.GenericAPIView):
 
     def get(self, request, id, match_id):
         """Get survey by id."""
-        survey = Survey.objects.filter(id=id)
+        survey = Survey.objects.filter(id=id).exists()
         if not survey:
             return failure_response("Survey does not exist", status.HTTP_404_NOT_FOUND)
         return success_response(
-            self.serializer_class(survey[0]).data, status.HTTP_200_OK
+            self.serializer_class(Survey.objects.get(id=id)).data, status.HTTP_200_OK
         )
 
     def post(self, request, id, match_id):
@@ -76,8 +75,8 @@ class SurveyView(generics.GenericAPIView):
 
     def delete(self, request, id, match_id):
         """Delete a survey by id."""
-        survey = Survey.objects.filter(id=id)
+        survey = Survey.objects.filter(id=id).exists()
         if not survey:
             return failure_response("Survey does not exist", status.HTTP_404_NOT_FOUND)
-        survey[0].delete()
+        Survey.objects.get(id=id).delete()
         return success_response(None, status.HTTP_200_OK)
