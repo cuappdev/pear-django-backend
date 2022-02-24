@@ -12,9 +12,9 @@ from .controllers.update_survey_controller import UpdateSurveyController
 from .serializers import SurveySerializer
 
 
-class SurveysView(generics.GenericAPIView):
+class AllSurveysView(generics.GenericAPIView):
     serializer_class = SurveySerializer
-    permission_classes = api_settings.CONSUMER_PERMISSIONS
+    permission_classes = api_settings.ADMIN_PERMISSIONS
 
     def get(self, request):
         """Get all surveys."""
@@ -32,20 +32,40 @@ class SurveysView(generics.GenericAPIView):
         return CreateSurveyController(request, data).process()
 
 
+class SurveysView(generics.GenericAPIView):
+    serializer_class = SurveySerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def get(self, request, match_id):
+        """Get all surveys."""
+        surveys = Survey.objects.filter(completed_match_id=match_id)
+        return success_response(
+            self.serializer_class(surveys, many=True).data, status.HTTP_200_OK
+        )
+
+    def post(self, request, match_id):
+        """Create a survey."""
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            data = request.data
+        return CreateSurveyController(request, data, match_id).process()
+
+
 class SurveyView(generics.GenericAPIView):
     serializer_class = SurveySerializer
     permission_classes = api_settings.CONSUMER_PERMISSIONS
 
-    def get(self, request, id):
+    def get(self, request, id, match_id):
         """Get survey by id."""
-        survey = Survey.objects.filter(id=id)
+        survey = Survey.objects.filter(id=id).exists()
         if not survey:
             return failure_response("Survey does not exist", status.HTTP_404_NOT_FOUND)
         return success_response(
-            self.serializer_class(survey[0]).data, status.HTTP_200_OK
+            self.serializer_class(Survey.objects.get(id=id)).data, status.HTTP_200_OK
         )
 
-    def post(self, request, id):
+    def post(self, request, id, match_id):
         """Update survey by id."""
         try:
             data = json.loads(request.body)
@@ -53,10 +73,10 @@ class SurveyView(generics.GenericAPIView):
             data = request.data
         return UpdateSurveyController(id, data).process()
 
-    def delete(self, request, id):
+    def delete(self, request, id, match_id):
         """Delete a survey by id."""
-        survey = Survey.objects.filter(id=id)
+        survey = Survey.objects.filter(id=id).exists()
         if not survey:
             return failure_response("Survey does not exist", status.HTTP_404_NOT_FOUND)
-        survey[0].delete()
+        Survey.objects.get(id=id).delete()
         return success_response(None, status.HTTP_200_OK)

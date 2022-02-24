@@ -25,6 +25,7 @@ from prompt.views import PromptsView
 from prompt.views import PromptView
 from purpose.views import PurposesView
 from purpose.views import PurposeView
+from survey.views import AllSurveysView
 from survey.views import SurveysView
 from survey.views import SurveyView
 
@@ -63,9 +64,16 @@ urlpatterns = [
         CancelCurrentMatchView.as_view(),
         name="cancel_current_match",
     ),
-    # Survey URLs
-    path("feedback/", SurveysView.as_view(), name="surveys"),
-    path("feedback/<int:id>/", SurveyView.as_view(), name="survey"),
+    # Survey/Feedback URLs
+    path("matches/feedback/", AllSurveysView.as_view(), name="surveys"),
+    path(
+        "matches/<int:match_id>/feedback/", SurveysView.as_view(), name="match_surveys"
+    ),
+    path(
+        "matches/<int:match_id>/feedback/<int:id>/",
+        SurveyView.as_view(),
+        name="match_survey",
+    ),
     # Prompt URLs
     path("prompts/", PromptsView.as_view(), name="prompts"),
     path("prompts/<int:id>/", PromptView.as_view(), name="prompt"),
