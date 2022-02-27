@@ -7,7 +7,6 @@ from survey.models import Survey
 
 
 class SurveySerializer(serializers.ModelSerializer):
-
     did_not_meet_reasons = SerializerMethodField("get_did_not_meet_reasons")
 
     def get_did_not_meet_reasons(self, survey):
