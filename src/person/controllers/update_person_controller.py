@@ -15,6 +15,8 @@ from rest_framework import status
 
 from ..tasks import upload_profile_pic
 
+from datetime import timedelta, datetime
+
 
 class UpdatePersonController:
     def __init__(self, user, data, serializer):
@@ -46,6 +48,9 @@ class UpdatePersonController:
         pending_feedback = self._data.get("pending_feedback")
         deleted = self._data.get("deleted")
         fcm_registration_token = self._data.get("fcm_registration_token")
+        is_paused = self._data.get("is_paused")
+        pause_expiration = self._data.get("pause_expiration")
+        pause_weeks = self._data.get("pause_weeks")
 
         many_to_many_sets = [
             [Purpose, self._person.purposes, purpose_ids],
@@ -59,6 +64,11 @@ class UpdatePersonController:
             possible_error = update_many_to_many_set(class_name, existing_set, ids)
             if possible_error is not None:
                 return possible_error
+
+        if pause_weeks is not None:
+            if pause_weeks != 1:
+                pause_expiration = datetime.now() + datetime.timedelta(weeks=pause_weeks)
+                
 
         if profile_pic_base64 is not None:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)
@@ -111,6 +121,8 @@ class UpdatePersonController:
         modify_attribute(self._person, "availability", json.dumps(availability))
         modify_attribute(self._person, "profile_pic_url", profile_pic_url)
         modify_attribute(self._person, "soft_deleted", deleted)
+        modify_attribute(self._person, "is_paused", is_paused)
+        modify_attribute(self._person, "pause_expiration", pause_expiration)
         self._user.save()
         self._person.save()
         return success_response(status=status.HTTP_200_OK)
