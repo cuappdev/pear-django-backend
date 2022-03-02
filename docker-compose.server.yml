@@ -6,8 +6,6 @@ services:
     hostname: redis
     networks:
       - main
-    ports:
-      - "6379:6379"
     restart: always
 
   app:
@@ -41,6 +39,19 @@ services:
       replicas: 3
       restart_policy:
         condition: on-failure
+    networks:
+      - main
+    restart: always
+
+  celery_beat:
+    image: cornellappdev/pear-django:${IMAGE_TAG}
+    hostname: celery_beat
+    env_file: .env
+    command: sh -c "./wait-for-it.sh redis:6379 && ./wait-for-it.sh app:8000 -- celery -A pear beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    depends_on:
+      - app
+      - redis
+      - celery_worker
     networks:
       - main
     restart: always

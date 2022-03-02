@@ -111,6 +111,7 @@ class UpdatePersonController:
         modify_attribute(self._person, "availability", json.dumps(availability))
         modify_attribute(self._person, "profile_pic_url", profile_pic_url)
         modify_attribute(self._person, "soft_deleted", deleted)
+        modify_attribute(self._person, "pending_feedback", pending_feedback)
         self._user.save()
         self._person.save()
         return success_response(status=status.HTTP_200_OK)
