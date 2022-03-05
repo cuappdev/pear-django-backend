@@ -43,11 +43,11 @@ class MassMessageController:
 
         if errors:
             return failure_response(
-                message=f"{message_count} messages sent, but {len(errors)} errors occurred: \n {errors}",
+                message=f"{message_count} messages sent, but {len(errors)} errors occurred: {errors}",
                 status=status.HTTP_502_BAD_GATEWAY,
             )
 
         return success_response(
-            message=f"{message_count} messages sent, {len(users)-message_count} users do not have push notifications enabled",
+            data=f"{message_count} messages sent, {len(users)-message_count} users do not have push notifications enabled",
             status=status.HTTP_201_CREATED,
         )
