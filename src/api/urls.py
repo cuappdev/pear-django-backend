@@ -69,11 +69,9 @@ urlpatterns = [
     ),
     # Survey/Feedback URLs
     path("matches/feedback/", AllSurveysView.as_view(), name="surveys"),
+    path("match/<int:match_id>/feedback/", SurveysView.as_view(), name="match_surveys"),
     path(
-        "matches/<int:match_id>/feedback/", SurveysView.as_view(), name="match_surveys"
-    ),
-    path(
-        "matches/<int:match_id>/feedback/<int:id>/",
+        "match/<int:match_id>/feedback/<int:id>/",
         SurveyView.as_view(),
         name="match_survey",
     ),
