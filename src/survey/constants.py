@@ -9,7 +9,7 @@ RATINGS = [STRONGLY_BAD, SLIGHTLY_BAD, NEUTRAL, SLIGHTLY_GOOD, STRONGLY_GOOD]
 
 DID_NOT_MEET = {
     "BF": "Not a good fit",
-    "NR": "Did not respond",
+    "NR": "They didn't respond",
     "NI": "Not interested",
     "TB": "Too busy",
     "OT": "Other",
