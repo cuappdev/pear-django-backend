@@ -1,49 +1,76 @@
+import json
+
 from api.utils import failure_response
 from api.utils import modify_attribute
 from api.utils import success_response
 from match import match_status
 from match.models import Match
-from person.models import Person
 from rest_framework import status
-from survey.constants import RATINGS
+from survey import constants
 from survey.models import Survey
 
 
 # TODO(@chalo2000) Convert to celery task
 class CreateSurveyController:
-    def __init__(self, request, data):
+    def __init__(self, request, data, match_id):
         self._request = request
         self._data = data
+        self._match_id = match_id
 
     def process(self):
         # Verify that all required fields are provided
         did_meet = self._data.get("did_meet")
-        explanation = self._data.get("explanation")
-        completed_match_id = self._data.get("completed_match_id")
-        if explanation is None:
-            return failure_response(
-                "POST body is misformatted", status.HTTP_400_BAD_REQUEST
-            )
+        if did_meet is None:
+            return failure_response("did_meet", status.HTTP_400_BAD_REQUEST)
 
-        # Get optional fields
+        # Get optional fields based on did_meet
+        did_meet_reason = self._data.get("did_meet_reason")
+        did_not_meet_reasons = self._data.get("did_not_meet_reasons")
         rating = self._data.get("rating")
-        if rating is not None and rating not in RATINGS:
-            return failure_response(
-                "The provided rating is invalid", status.HTTP_400_BAD_REQUEST
+        if did_meet:
+            if rating is None:
+                return failure_response(
+                    "Rating is required for a completed match",
+                    status.HTTP_400_BAD_REQUEST,
+                )
+            elif rating not in constants.RATINGS:
+                return failure_response(
+                    "The provided rating is invalid", status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            if not did_not_meet_reasons:
+                return failure_response(
+                    "did_not_meet_reasons is required if did_meet is False",
+                    status.HTTP_400_BAD_REQUEST,
+                )
+            if not all(
+                map(
+                    lambda x: x in constants.DID_NOT_MEET.values(), did_not_meet_reasons
+                )
+            ):
+                return failure_response(
+                    "did_not_meet_reasons has invalid elements",
+                    status.HTTP_400_BAD_REQUEST,
+                )
+
+            did_not_meet_reasons = list(
+                map(lambda x: constants.DID_NOT_MEET_REV[x], did_not_meet_reasons)
             )
+            if len(did_not_meet_reasons) > 5:
+                return failure_response(
+                    "Too many elements in did_not_meet_reasons",
+                    status.HTTP_400_BAD_REQUEST,
+                )
 
         # Verify that required ids are valid
-        completed_match = Match.objects.filter(id=completed_match_id)
+        completed_match = Match.objects.filter(id=self._match_id)
         if not completed_match:
-            return failure_response(
-                "completed_match_id is invalid", status.HTTP_404_NOT_FOUND
-            )
+            return failure_response("match_id is invalid", status.HTTP_404_NOT_FOUND)
         completed_match = completed_match[0]
 
         # Check if the submitting user has already submitted a survey
-        submitting_user = Person.objects.filter(id=self._request.user.id)[0]
         survey = Survey.objects.filter(
-            submitting_user=submitting_user, completed_match=completed_match
+            submitting_person=self._request.user.person, completed_match=completed_match
         )
         if survey:
             return failure_response(
@@ -64,10 +91,15 @@ class CreateSurveyController:
         # Create and return a new survey with the given fields
         survey = Survey.objects.create(
             did_meet=did_meet,
-            explanation=explanation,
+            did_meet_reason=did_meet_reason,
+            did_not_meet_reasons=json.dumps(did_not_meet_reasons)
+            if not did_meet
+            else None,
             rating=rating,
-            submitting_user=submitting_user,
+            submitting_person=self._request.user.person,
             completed_match=completed_match,
         )
+        self._request.user.person.pending_feedback = False
         survey.save()
+        self._request.user.person.save()
         return success_response(None, status.HTTP_201_CREATED)

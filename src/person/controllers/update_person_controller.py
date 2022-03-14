@@ -128,6 +128,7 @@ class UpdatePersonController:
         modify_attribute(self._person, "soft_deleted", deleted)
         modify_attribute(self._person, "is_paused", is_paused)
         modify_attribute(self._person, "pause_expiration", pause_expiration)
+        modify_attribute(self._person, "pending_feedback", pending_feedback)
         self._user.save()
         self._person.save()
         return success_response(status=status.HTTP_200_OK)

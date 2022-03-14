@@ -4,6 +4,7 @@ from api import settings as api_settings
 from api.utils import failure_response
 from api.utils import success_response
 from django.contrib.auth.models import User
+from person.controllers.mass_message_controller import MassMessageController
 from rest_framework import generics
 from rest_framework import status
 
@@ -91,6 +92,16 @@ class AllMatchesView(generics.GenericAPIView):
 
 
 class SendMessageView(generics.GenericAPIView):
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
     def post(self, request, id):
-        """Send push notification to user by user id."""
+        """Send message push notification to user by user id."""
         return SendMessageController(request.user, request.data, id).process()
+
+
+class MassMessageView(generics.GenericAPIView):
+    permission_classes = api_settings.ADMIN_PERMISSIONS
+
+    def post(self, request):
+        """Send custom push notification to multiple users by id."""
+        return MassMessageController(request.data).process()

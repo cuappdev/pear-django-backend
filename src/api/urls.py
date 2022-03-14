@@ -17,6 +17,7 @@ from match.views import MatchView
 from match.views import MultipleMatchesView
 from person.views import AllMatchesView
 from person.views import AuthenticateView
+from person.views import MassMessageView
 from person.views import MeView
 from person.views import SendMessageView
 from person.views import UsersView
@@ -25,6 +26,7 @@ from prompt.views import PromptsView
 from prompt.views import PromptView
 from purpose.views import PurposesView
 from purpose.views import PurposeView
+from survey.views import AllSurveysView
 from survey.views import SurveysView
 from survey.views import SurveyView
 
@@ -36,7 +38,9 @@ urlpatterns = [
     path("users/", UsersView.as_view(), name="users"),
     path("users/<int:id>/", UserView.as_view(), name="user"),
     path("users/<int:id>/matches/", AllMatchesView.as_view(), name="user_matches"),
+    # Push Notification URLs
     path("users/<int:id>/message/", SendMessageView.as_view(), name="user_messages"),
+    path("mass-message/", MassMessageView.as_view(), name="user_messages"),
     # Interest URLs
     path("interests/", InterestsView.as_view(), name="interests"),
     path("interests/<int:id>/", InterestView.as_view(), name="interest"),
@@ -63,9 +67,14 @@ urlpatterns = [
         CancelCurrentMatchView.as_view(),
         name="cancel_current_match",
     ),
-    # Survey URLs
-    path("feedback/", SurveysView.as_view(), name="surveys"),
-    path("feedback/<int:id>/", SurveyView.as_view(), name="survey"),
+    # Survey/Feedback URLs
+    path("matches/feedback/", AllSurveysView.as_view(), name="surveys"),
+    path("match/<int:match_id>/feedback/", SurveysView.as_view(), name="match_surveys"),
+    path(
+        "match/<int:match_id>/feedback/<int:id>/",
+        SurveyView.as_view(),
+        name="match_survey",
+    ),
     # Prompt URLs
     path("prompts/", PromptsView.as_view(), name="prompts"),
     path("prompts/<int:id>/", PromptView.as_view(), name="prompt"),
