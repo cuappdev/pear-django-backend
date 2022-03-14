@@ -10,7 +10,7 @@ from django_celery_beat.models import IntervalSchedule
 from django_celery_beat.models import PeriodicTask
 
 
-
+app = Celery()
 
 @shared_task
 def upload_profile_pic(user_id, profile_pic_base64):
