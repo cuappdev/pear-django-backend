@@ -112,19 +112,3 @@ class UserSerializer(serializers.ModelSerializer):
             "current_match",
         )
         read_only_fields = fields
-
-
-class AllMatchesSerializer(serializers.ModelSerializer):
-    """Serializer to get all of one user's matches."""
-
-    matches = serializers.SerializerMethodField("get_all_matches")
-
-    def get_all_matches(self, user):
-        matches = Match.objects.filter(Q(user_1=user) | Q(user_2=user)).order_by(
-            "-created_date"
-        )
-        return MatchSerializer(matches, user=user, many=True).data
-
-    class Meta:
-        model = User
-        fields = ("matches",)
