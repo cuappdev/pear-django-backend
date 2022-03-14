@@ -5,7 +5,7 @@ from celery import Celery
 from celery.signals import after_setup_logger
 from django_celery_beat.models import IntervalSchedule
 from django_celery_beat.models import PeriodicTask
-from person.models import Person
+from match.models import Match
 
 # Get Pear algorithm
 # current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -59,13 +59,8 @@ def setup_loggers(logger, *args, **kwargs):
 
 @app.task
 def test():
-    noah = Person.objects.get(net_id="njs99")
-    noah.user.last_name = "Solomon " + datetime.datetime.now().strftime(
-        "%m/%d/%Y, %H:%M:%S"
-    )
-    noah.save()
-    noah.user.save()
-    return "Saved Noah"
+    matches = Match.objects.filter(created_date__lt=datetime.datetime.now())
+    return matches.first().id
 
 
 schedule, _ = IntervalSchedule.objects.get_or_create(
