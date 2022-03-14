@@ -36,5 +36,5 @@ class Person(models.Model):
     soft_deleted = models.BooleanField(default=False)
     fcm_registration_token = models.TextField(default=None, null=True)
     is_paused= models.BooleanField(default=False)
-    pause_expiration = models.DateTimeField(default =None)
+    pause_expiration = models.DateTimeField(default =None, null = True)
 

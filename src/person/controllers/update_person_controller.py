@@ -65,9 +65,14 @@ class UpdatePersonController:
             if possible_error is not None:
                 return possible_error
 
+        if not is_paused:
+                self._person.pause_expiration = None
+                pause_weeks = None
+
         if pause_weeks is not None:
-            if pause_weeks != 1:
-                pause_expiration = datetime.now() + datetime.timedelta(weeks=pause_weeks)
+            if pause_weeks != 0:
+                days = pause_weeks * 6
+                pause_expiration = datetime.now() + timedelta(days=days)
                 
 
         if profile_pic_base64 is not None:

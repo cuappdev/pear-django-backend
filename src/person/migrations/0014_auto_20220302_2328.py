@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='person',
             name='pause_expiration',
-            field=models.DateTimeField(default=None),
+            field=models.DateTimeField(default=None, null=True),
         ),
     ]
