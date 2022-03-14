@@ -3,6 +3,13 @@ import os
 from celery import shared_task
 from django.contrib.auth.models import User
 import requests
+import datetime
+from person.models import Person
+
+from django_celery_beat.models import IntervalSchedule
+from django_celery_beat.models import PeriodicTask
+
+
 
 
 @shared_task
@@ -18,3 +25,20 @@ def upload_profile_pic(user_id, profile_pic_base64):
         user.person.profile_pic_url = response.json().get("data")
         user.save()
         user.person.save()
+
+
+@app.task
+def update_paused_users():
+    expired_users = Person.objects.filter(pause_expiration__lt = datetime.datetime.now())
+    expired_users.update(is_paused=False, pause_expiration=None)
+    return f"updated {len(expired_users)} users"
+
+schedule, _ = IntervalSchedule.objects.get_or_create(
+    every=5,
+    period=IntervalSchedule.SECONDS,
+)
+PeriodicTask.objects.get_or_create(
+    interval=schedule,
+    name="Pause Pear Updater",
+    task="person.tasks.update_paused_users",
+)
