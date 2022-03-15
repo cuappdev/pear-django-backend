@@ -31,7 +31,7 @@ class AuthenticateSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Serializer with match history."""
+    """Serializer with current match."""
 
     net_id = serializers.CharField(source="person.net_id")
     majors = MajorSerializer(source="person.majors", many=True)
@@ -51,6 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
     deleted = serializers.BooleanField(source="person.soft_deleted")
+    blocked_users = SerializerMethodField("get_blocked_users")
 
     def get_availability(self, user):
         if user.person.availability is None:
@@ -86,6 +87,9 @@ class UserSerializer(serializers.ModelSerializer):
             )
         return prompts
 
+    def get_blocked_users(self, user):
+        return map(lambda u: u.id, user.person.blocked_users.all())
+
     class Meta:
         model = User
         fields = (
@@ -110,6 +114,7 @@ class UserSerializer(serializers.ModelSerializer):
             "deleted",
             "pending_feedback",
             "current_match",
+            "blocked_users",
         )
         read_only_fields = fields
 

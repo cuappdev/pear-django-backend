@@ -105,3 +105,35 @@ class MassMessageView(generics.GenericAPIView):
     def post(self, request):
         """Send custom push notification to multiple users by id."""
         return MassMessageController(request.data).process()
+
+
+class BlockUserView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def post(self, request, id):
+        """Block user by id."""
+        if not User.objects.filter(id=id).exists():
+            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        if request.user.person.blocked_users.filter(id=id).exists():
+            # User is already blocked
+            return success_response(status=status.HTTP_200_OK)
+        else:
+            request.user.person.blocked_users.add(id)
+            return success_response(status=status.HTTP_201_CREATED)
+
+
+class UnblockUserView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def post(self, request, id):
+        """Unblock user by id."""
+        if not User.objects.filter(id=id).exists():
+            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        elif request.user.person.blocked_users.filter(id=id).exists():
+            request.user.person.blocked_users.remove(id)
+            return success_response(status=status.HTTP_201_CREATED)
+        else:
+            # User is already unblocked
+            return success_response(status=status.HTTP_200_OK)
