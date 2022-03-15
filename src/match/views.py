@@ -21,10 +21,13 @@ class MyMatchesView(generics.GenericAPIView):
     permission_classes = api_settings.CONSUMER_PERMISSIONS
 
     def get(self, request):
-        """Get all of a user's matches."""
+        """Get all of a user's matches, exluding blocked users."""
         user = request.user
-        matches = Match.objects.filter(Q(user_1=user) | Q(user_2=user)).order_by(
-            "-created_date"
+        blocked_ids = user.person.blocked_users.values_list("id", flat=True)
+        matches = (
+            Match.objects.filter(Q(user_1=user) | Q(user_2=user))
+            .exclude(Q(user_1_id__in=blocked_ids) | Q(user_2_id__in=blocked_ids))
+            .order_by("-created_date")
         )
         return success_response(self.serializer_class(matches, many=True).data)
 
