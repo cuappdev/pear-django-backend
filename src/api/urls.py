@@ -9,13 +9,13 @@ from location.views import LocationsView
 from location.views import LocationView
 from major.views import MajorsView
 from major.views import MajorView
+from match.views import AllMatchesView
 from match.views import CancelCurrentMatchView
 from match.views import CancelMatchView
 from match.views import CurrentMatchView
-from match.views import MatchesView
 from match.views import MatchView
 from match.views import MultipleMatchesView
-from person.views import AllMatchesView
+from match.views import MyMatchesView
 from person.views import AuthenticateView
 from person.views import BlockUserView
 from person.views import MassMessageView
@@ -61,7 +61,8 @@ urlpatterns = [
     path("purposes/", PurposesView.as_view(), name="purposes"),
     path("purposes/<int:id>/", PurposeView.as_view(), name="purpose"),
     # Match URLs
-    path("matches/", MatchesView.as_view(), name="matches"),
+    path("matches/", MyMatchesView.as_view(), name="matches"),
+    path("matches/all/", AllMatchesView.as_view(), name="all_matches"),
     path("matches/multiple/", MultipleMatchesView.as_view(), name="multiple_matches"),
     path("matches/<int:id>/", MatchView.as_view(), name="match"),
     path("matches/<int:id>/cancel/", CancelMatchView.as_view(), name="cancel_match"),

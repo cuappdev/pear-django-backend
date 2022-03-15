@@ -12,7 +12,6 @@ from .controllers.authenticate_controller import AuthenticateController
 from .controllers.search_person_controller import SearchPersonController
 from .controllers.send_message_controller import SendMessageController
 from .controllers.update_person_controller import UpdatePersonController
-from .serializers import AllMatchesSerializer
 from .serializers import AuthenticateSerializer
 from .serializers import UserSerializer
 from .simple_serializers import SimpleUserSerializer
@@ -78,17 +77,6 @@ class UsersView(generics.GenericAPIView):
     def get(self, request):
         """Get users requested with search query."""
         return SearchPersonController(request.GET, self.serializer_class).process()
-
-
-class AllMatchesView(generics.GenericAPIView):
-    serializer_class = AllMatchesSerializer
-
-    def get(self, request, id):
-        """Get all matches for user by user id."""
-        user = User.objects.filter(id=id)
-        if not user:
-            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
-        return success_response(self.serializer_class(user[0]).data, status.HTTP_200_OK)
 
 
 class SendMessageView(generics.GenericAPIView):
