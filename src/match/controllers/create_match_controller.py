@@ -1,6 +1,7 @@
 from api.utils import failure_response
 from api.utils import success_response
 from django.contrib.auth.models import User
+from django.db.models import Q
 from match import match_status
 from match.models import Match
 from rest_framework import status
@@ -14,6 +15,7 @@ class CreateMatchController:
 
     def process(self):
         match_ids = self._data.get("ids")
+        cancel_previous = self._data.get("cancel_previous", False)
         if match_ids is None:
             error_msg = "POST body is misformatted"
             return (
@@ -44,6 +46,15 @@ class CreateMatchController:
         possible_match = Match.objects.filter(
             user_1=user_1, user_2=user_2, status=match_status.CREATED
         )
+        if cancel_previous:
+            user_1_previous_matches = Match.objects.filter(
+                Q(user_1=user_1) | Q(user_2=user_1)
+            )
+            user_2_previous_matches = Match.objects.filter(
+                Q(user_1=user_2) | Q(user_2=user_2)
+            )
+            user_1_previous_matches.update(status=match_status.CANCELED)
+            user_2_previous_matches.update(status=match_status.CANCELED)
         if possible_match:
             return (
                 (True, "")
