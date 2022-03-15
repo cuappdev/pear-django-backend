@@ -1,16 +1,13 @@
+import datetime
 import os
 
 from celery import shared_task
 from django.contrib.auth.models import User
-import requests
-import datetime
-from person.models import Person
-
 from django_celery_beat.models import IntervalSchedule
 from django_celery_beat.models import PeriodicTask
+from person.models import Person
+import requests
 
-
-app = Celery()
 
 @shared_task
 def upload_profile_pic(user_id, profile_pic_base64):
@@ -27,11 +24,12 @@ def upload_profile_pic(user_id, profile_pic_base64):
         user.person.save()
 
 
-@app.task
+@shared_task
 def update_paused_users():
-    expired_users = Person.objects.filter(pause_expiration__lt = datetime.datetime.now())
+    expired_users = Person.objects.filter(pause_expiration__lt=datetime.datetime.now())
     expired_users.update(is_paused=False, pause_expiration=None)
-    return f"updated {len(expired_users)} users"
+    return f"Unpaused {len(expired_users)} users"
+
 
 schedule, _ = IntervalSchedule.objects.get_or_create(
     every=5,
