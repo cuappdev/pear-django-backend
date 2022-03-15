@@ -60,12 +60,17 @@ class UserSerializer(serializers.ModelSerializer):
         return availability
 
     def get_current_match(self, user):
+        blocked_ids = user.person.blocked_users.values_list("id", flat=True)
         matches = Match.objects.filter(Q(user_1=user) | Q(user_2=user)).order_by(
             "-created_date"
         )
-        if len(matches) == 0:
+        if (
+            len(matches) == 0
+            or matches[0].user_1.id in blocked_ids
+            or matches[0].user_2.id in blocked_ids
+        ):
             return None
-        return MatchSerializer(matches[0], user=user).data
+        return MatchSerializer(matches.first(), user=user).data
 
     def get_prompts(self, user):
         prompt_questions = user.person.prompt_questions.all()
