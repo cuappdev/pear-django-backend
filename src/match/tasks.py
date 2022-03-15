@@ -21,17 +21,12 @@ schedule, _ = IntervalSchedule.objects.get_or_create(
 @shared_task
 def update_noah():
     noah = User.objects.get(person__net_id="njs99")
-    noah.user.last_name = "Solomon " + datetime.datetime.now().strftime(
-        "%m/%d/%Y, %H:%M:%S"
-    )
+    noah.last_name = "Solomon " + datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
     noah.save()
-    noah.user.save()
     return "Saved Noah"
 
 
 PeriodicTask.objects.get_or_create(
-    # TODO: Change to crontab schedule after testing on
-    # crontab=schedule,
     interval=schedule,
     name="Update Noah",
     task="match.tasks.update_noah",
