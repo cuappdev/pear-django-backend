@@ -25,8 +25,6 @@ schedule, _ = IntervalSchedule.objects.get_or_create(
 
 @shared_task
 def matcher():
-    global schedule
-    print(schedule)
     # Cancel previous matches that were not completed
     unfinished_matches = Match.objects.all().exclude(
         status__in=[match_status.CANCELED, match_status.INACTIVE]
