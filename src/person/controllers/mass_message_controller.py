@@ -58,7 +58,7 @@ class MassMessageController:
         if sandbox:
             # no messages were sent
             return success_response(
-                data=f"{notifs_enabled_count} users have push notifications enabled",
+                data=f"{notifs_enabled_count} users have push notifications enabled, no notfications sent (sandbox mode)",
                 status=status.HTTP_200_OK,
             )
         else:
