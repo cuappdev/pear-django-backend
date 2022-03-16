@@ -7,8 +7,6 @@ from major.models import Major
 from prompt.models import Prompt
 from purpose.models import Purpose
 
-import datetime
-
 
 class Person(models.Model):
     net_id = models.CharField(max_length=15)
@@ -35,6 +33,5 @@ class Person(models.Model):
     purposes = models.ManyToManyField(Purpose, default=None, blank=True)
     soft_deleted = models.BooleanField(default=False)
     fcm_registration_token = models.TextField(default=None, null=True)
-    is_paused= models.BooleanField(default=False)
-    pause_expiration = models.DateTimeField(default =None, null = True)
-
+    is_paused = models.BooleanField(default=False)
+    pause_expiration = models.DateTimeField(default=None, null=True)
