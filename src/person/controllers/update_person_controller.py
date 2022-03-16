@@ -49,7 +49,6 @@ class UpdatePersonController:
         deleted = self._data.get("deleted")
         fcm_registration_token = self._data.get("fcm_registration_token")
         is_paused = self._data.get("is_paused")
-        pause_expiration = self._data.get("pause_expiration")
         pause_weeks = self._data.get("pause_weeks")
 
         many_to_many_sets = [
@@ -72,7 +71,7 @@ class UpdatePersonController:
         if pause_weeks is not None:
             if pause_weeks != 0:
                 days = pause_weeks * 6
-                pause_expiration = datetime.now() + timedelta(days=days)
+                self._person.pause_expiration = datetime.now() + timedelta(days=days)
                 
 
         if profile_pic_base64 is not None:
@@ -127,7 +126,6 @@ class UpdatePersonController:
         modify_attribute(self._person, "profile_pic_url", profile_pic_url)
         modify_attribute(self._person, "soft_deleted", deleted)
         modify_attribute(self._person, "is_paused", is_paused)
-        modify_attribute(self._person, "pause_expiration", pause_expiration)
         modify_attribute(self._person, "pending_feedback", pending_feedback)
         self._user.save()
         self._person.save()
