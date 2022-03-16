@@ -64,7 +64,7 @@ class UpdatePersonController:
             if possible_error is not None:
                 return possible_error
 
-        if not is_paused:
+        if is_paused is False:
             self._person.pause_expiration = None
             pause_weeks = None
 
