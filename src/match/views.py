@@ -21,7 +21,7 @@ class MyMatchesView(generics.GenericAPIView):
     permission_classes = api_settings.CONSUMER_PERMISSIONS
 
     def get(self, request):
-        """Get all of a user's matches, exluding blocked users."""
+        """Get all of a user's matches, excluding blocked users."""
         user = request.user
         blocked_ids = user.person.blocked_users.values_list("id", flat=True)
         matches = (
