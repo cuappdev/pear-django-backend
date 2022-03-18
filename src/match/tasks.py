@@ -8,6 +8,7 @@ from celery.signals import after_setup_logger
 from django.utils import timezone
 from django_celery_beat.models import IntervalSchedule
 from django_celery_beat.models import PeriodicTask
+from main import main
 from match import match_status
 from match.controllers.create_match_controller import CreateMatchController
 from match.models import Match
@@ -17,7 +18,6 @@ from person.models import Person
 current_dir = os.path.dirname(os.path.abspath(__file__))
 submodule_path = f"{current_dir}/../../pear-algorithm/src"
 sys.path.insert(0, submodule_path)
-from main import main
 
 app = Celery()
 

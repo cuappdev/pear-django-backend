@@ -31,8 +31,10 @@ class Person(models.Model):
     has_onboarded = models.BooleanField(default=False)
     pending_feedback = models.BooleanField(default=False)
     purposes = models.ManyToManyField(Purpose, default=None, blank=True)
-    soft_deleted = models.BooleanField(default=False)
+    soft_deleted = models.BooleanField(default=False, null=True)
     fcm_registration_token = models.TextField(default=None, null=True)
     blocked_users = models.ManyToManyField(
         User, default=None, blank=True, related_name="blocked_users"
     )
+    is_paused = models.BooleanField(default=False, null=True)
+    pause_expiration = models.DateTimeField(default=None, null=True)

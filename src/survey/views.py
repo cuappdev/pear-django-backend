@@ -51,6 +51,7 @@ class SurveysView(generics.GenericAPIView):
             data = request.data
         return CreateSurveyController(request, data, match_id).process()
 
+
 class SurveyView(generics.GenericAPIView):
     serializer_class = SurveySerializer
     permission_classes = api_settings.CONSUMER_PERMISSIONS
