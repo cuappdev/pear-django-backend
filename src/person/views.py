@@ -107,7 +107,6 @@ class BlockUserView(generics.GenericAPIView):
             # User is already blocked
             return success_response(status=status.HTTP_200_OK)
         elif request.user.id == id:
-            # User is blocking themself
             return failure_response(
                 "You cannot block yourself.", status.HTTP_403_FORBIDDEN
             )
@@ -124,9 +123,13 @@ class UnblockUserView(generics.GenericAPIView):
         """Unblock user by id."""
         if not User.objects.filter(id=id).exists():
             return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        elif id == request.user.id:
+            return failure_response(
+                "You cannot unblock yourself.", status.HTTP_403_FORBIDDEN
+            )
         elif request.user.person.blocked_users.filter(id=id).exists():
             request.user.person.blocked_users.remove(id)
             return success_response(status=status.HTTP_201_CREATED)
         else:
-            # User is already unblocked
+            # User is not blocked anyways
             return success_response(status=status.HTTP_200_OK)
