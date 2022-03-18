@@ -103,12 +103,14 @@ class BlockUserView(generics.GenericAPIView):
         """Block user by id."""
         if not User.objects.filter(id=id).exists():
             return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
-        if (
-            request.user.person.blocked_users.filter(id=id).exists()
-            or request.user.id == id
-        ):
-            # User is already blocked or user is blocking themself
+        if request.user.person.blocked_users.filter(id=id).exists():
+            # User is already blocked
             return success_response(status=status.HTTP_200_OK)
+        elif request.user.id == id:
+            # User is blocking themself
+            return failure_response(
+                "You cannot block yourself.", status.HTTP_403_FORBIDDEN
+            )
         else:
             request.user.person.blocked_users.add(id)
             return success_response(status=status.HTTP_201_CREATED)
