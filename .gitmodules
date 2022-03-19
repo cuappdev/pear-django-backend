@@ -1,3 +1,3 @@
-[submodule "src/pear_algorithm"]
-	path = src/pear_algorithm
+[submodule "src/pear-algorithm"]
+	path = src/pear-algorithm
 	url = git@github.com:cuappdev/pear-algorithm.git

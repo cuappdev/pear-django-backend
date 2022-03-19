@@ -1,4 +1,5 @@
 import datetime
+import importlib
 
 from celery import shared_task
 from django.contrib.auth.models import User
@@ -8,7 +9,8 @@ from django_celery_beat.models import PeriodicTask
 from match import match_status
 from match.controllers.create_match_controller import CreateMatchController
 from match.models import Match
-from pear_algorithm.src.main import main as pear_algorithm
+
+algorithm = importlib.import_module("pear-algorithm.src.main.main")
 
 # PROOF OF CONCEPT
 
@@ -50,7 +52,7 @@ def matcher():
     users = User.objects.filter(
         Q(person__has_onboarded=True) & Q(person__soft_deleted=False)
     )
-    pears = pear_algorithm(users)
+    pears = algorithm.main(users)
     match_creator = CreateMatchController(None, None, return_status=True)
 
     # Create new matches
