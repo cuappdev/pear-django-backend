@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import timedelta
 import json
 
 from api.utils import failure_response
@@ -46,6 +48,8 @@ class UpdatePersonController:
         pending_feedback = self._data.get("pending_feedback")
         deleted = self._data.get("deleted")
         fcm_registration_token = self._data.get("fcm_registration_token")
+        is_paused = self._data.get("is_paused")
+        pause_weeks = self._data.get("pause_weeks")
 
         many_to_many_sets = [
             [Purpose, self._person.purposes, purpose_ids],
@@ -59,6 +63,15 @@ class UpdatePersonController:
             possible_error = update_many_to_many_set(class_name, existing_set, ids)
             if possible_error is not None:
                 return possible_error
+
+        if is_paused is False:
+            self._person.pause_expiration = None
+            pause_weeks = None
+
+        if pause_weeks is not None:
+            if pause_weeks != 0:
+                days = pause_weeks * 6
+                self._person.pause_expiration = datetime.now() + timedelta(days=days)
 
         if profile_pic_base64 is not None:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)
@@ -111,6 +124,7 @@ class UpdatePersonController:
         modify_attribute(self._person, "availability", json.dumps(availability))
         modify_attribute(self._person, "profile_pic_url", profile_pic_url)
         modify_attribute(self._person, "soft_deleted", deleted)
+        modify_attribute(self._person, "is_paused", is_paused)
         modify_attribute(self._person, "pending_feedback", pending_feedback)
         self._user.save()
         self._person.save()
