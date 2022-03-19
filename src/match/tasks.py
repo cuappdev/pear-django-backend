@@ -1,41 +1,12 @@
-import datetime
-
 from celery import shared_task
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django_celery_beat.models import IntervalSchedule
+from django_celery_beat.models import CrontabSchedule
 from django_celery_beat.models import PeriodicTask
 from match import match_status
 from match.controllers.create_match_controller import CreateMatchController
 from match.models import Match
 from pear_algorithm.src.main import main as pear_algorithm
-
-# PROOF OF CONCEPT
-
-schedule, _ = IntervalSchedule.objects.get_or_create(
-    every=1,
-    period=IntervalSchedule.MINUTES,
-)
-
-
-@shared_task
-def update_noah():
-    noah = User.objects.get(person__net_id="njs99")
-    noah.last_name = "Solomon " + datetime.datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
-    noah.save()
-    return "Saved Noah"
-
-
-PeriodicTask.objects.get_or_create(
-    interval=schedule,
-    name="Update Noah",
-    task="match.tasks.update_noah",
-)
-
-# END PROOF OF CONCEPT
-
-# TODO: Test above schedule on dev w/ more users to see if this works,
-#  eventually change to task below
 
 
 @shared_task
@@ -61,9 +32,16 @@ def matcher():
             print(f"Match error between {pear}: {error_msg}")
 
 
-# TODO: uncomment after proof of concept works on dev server
-# PeriodicTask.objects.get_or_create(
-#     crontab=schedule,
-#     name="Matching Algorithm",
-#     task="match.tasks.matcher",
-# )
+schedule, _ = CrontabSchedule.objects.get_or_create(
+    minute="48",
+    hour="17",
+    day_of_week="6",
+    day_of_month="*",
+    month_of_year="*",
+)
+
+PeriodicTask.objects.get_or_create(
+    crontab=schedule,
+    name="Matching Algorithm 2",
+    task="match.tasks.matcher",
+)
