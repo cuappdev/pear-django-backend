@@ -9,9 +9,9 @@ RUN mkdir -p /usr/src/pear-algorithm
 # Setup submodule code
 WORKDIR /usr/src/pear-algorithm
 
-COPY /pear-algorithm/ .
+COPY /src/pear_algorithm/ .
 
-COPY ./pear-algorithm/requirements.txt algorithm_reqs.txt
+COPY ./src/pear_algorithm/requirements.txt algorithm_reqs.txt
 
 RUN pip3 install --no-cache-dir -r algorithm_reqs.txt
 
