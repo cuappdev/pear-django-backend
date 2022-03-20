@@ -33,15 +33,15 @@ def matcher():
 
 
 schedule, _ = CrontabSchedule.objects.get_or_create(
-    minute="30",
-    hour="22",
+    minute="05",
+    hour="23",
     day_of_week="7",
     day_of_month="*",
     month_of_year="*",
 )
 
-PeriodicTask.objects.get_or_create(
+PeriodicTask.objects.create(
     crontab=schedule,
-    name="Matching Algorithm 4",
+    name="Matching Algorithm",
     task="match.tasks.matcher",
 )
