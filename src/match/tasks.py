@@ -33,7 +33,7 @@ def matcher():
 
 
 schedule, _ = CrontabSchedule.objects.get_or_create(
-    minute="20",
+    minute="30",
     hour="22",
     day_of_week="7",
     day_of_month="*",
