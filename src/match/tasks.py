@@ -1,58 +1,27 @@
-import datetime
-import logging
-import os
-import sys
-
-from celery import Celery
-from celery.signals import after_setup_logger
-from django.utils import timezone
-from django_celery_beat.models import IntervalSchedule
+from celery import shared_task
+from django.contrib.auth.models import User
+from django.db.models import Q
+from django_celery_beat.models import CrontabSchedule
 from django_celery_beat.models import PeriodicTask
-from main import main
 from match import match_status
 from match.controllers.create_match_controller import CreateMatchController
 from match.models import Match
-from person.models import Person
-
-# Get Pear algorithm
-current_dir = os.path.dirname(os.path.abspath(__file__))
-submodule_path = f"{current_dir}/../../pear-algorithm/src"
-sys.path.insert(0, submodule_path)
-
-app = Celery()
-
-# https://www.distributedpython.com/2018/08/28/celery-logging/
-logger = logging.getLogger(__name__)
+from pear_algorithm.src.main import main as pear_algorithm
 
 
-@after_setup_logger.connect
-def setup_loggers(logger, *args, **kwargs):
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    sh = logging.StreamHandler()
-    sh.setFormatter(formatter)
-    logger.addHandler(sh)
-
-
-@app.task
+@shared_task
 def matcher():
-    # Cancel previous matches that were not completed. TODO verify this is what we want to do
-    today = timezone.now()
-    last_week = today - datetime.timedelta(
-        days=7
-    )  # should be before pears are released but after matching
-    previous_matches = Match.objects.filter(created_date__range=[last_week, today])
-    print(f"Previous: {previous_matches}")
-    unfinished_matches = previous_matches.exclude(
+    # Cancel previous matches that were not completed
+    unfinished_matches = Match.objects.all().exclude(
         status__in=[match_status.CANCELED, match_status.INACTIVE]
     )
-    print(f"Unfinished: {unfinished_matches}")
     unfinished_matches.update(status=match_status.CANCELED)
 
     # Generate pears
-    users = Person.objects.all()
-    pears = main(users, logger)
+    users = User.objects.filter(
+        Q(person__has_onboarded=True) & Q(person__soft_deleted=False)
+    )
+    pears = pear_algorithm(users)
     match_creator = CreateMatchController(None, None, return_status=True)
 
     # Create new matches
@@ -63,13 +32,16 @@ def matcher():
             print(f"Match error between {pear}: {error_msg}")
 
 
-schedule, _ = IntervalSchedule.objects.get_or_create(
-    every=1,
-    period=IntervalSchedule.MINUTES,
+schedule, _ = CrontabSchedule.objects.get_or_create(
+    minute="3",
+    hour="18",
+    day_of_week="6",
+    day_of_month="*",
+    month_of_year="*",
 )
 
 PeriodicTask.objects.get_or_create(
-    interval=schedule,
-    name="Pear Algorithm",
+    crontab=schedule,
+    name="Matching Algorithm 3",
     task="match.tasks.matcher",
 )

@@ -31,7 +31,7 @@ class AuthenticateSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Serializer with match history."""
+    """Serializer with current match."""
 
     net_id = serializers.CharField(source="person.net_id")
     majors = MajorSerializer(source="person.majors", many=True)
@@ -51,6 +51,7 @@ class UserSerializer(serializers.ModelSerializer):
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
     current_match = serializers.SerializerMethodField("get_current_match")
     deleted = serializers.BooleanField(source="person.soft_deleted")
+    blocked_users = SerializerMethodField("get_blocked_users")
     is_paused = serializers.BooleanField(source="person.is_paused")
     pause_expiration = serializers.DateTimeField(source="person.pause_expiration")
 
@@ -61,12 +62,17 @@ class UserSerializer(serializers.ModelSerializer):
         return availability
 
     def get_current_match(self, user):
+        blocked_ids = user.person.blocked_users.values_list("id", flat=True)
         matches = Match.objects.filter(Q(user_1=user) | Q(user_2=user)).order_by(
             "-created_date"
         )
-        if len(matches) == 0:
+        if (
+            len(matches) == 0
+            or matches[0].user_1.id in blocked_ids
+            or matches[0].user_2.id in blocked_ids
+        ):
             return None
-        return MatchSerializer(matches[0], user=user).data
+        return MatchSerializer(matches.first(), user=user).data
 
     def get_prompts(self, user):
         prompt_questions = user.person.prompt_questions.all()
@@ -87,6 +93,9 @@ class UserSerializer(serializers.ModelSerializer):
                 }
             )
         return prompts
+
+    def get_blocked_users(self, user):
+        return map(lambda u: u.id, user.person.blocked_users.all())
 
     class Meta:
         model = User
@@ -112,6 +121,7 @@ class UserSerializer(serializers.ModelSerializer):
             "deleted",
             "pending_feedback",
             "current_match",
+            "blocked_users",
             "is_paused",
             "pause_expiration",
         )
