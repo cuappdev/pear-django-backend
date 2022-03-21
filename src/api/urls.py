@@ -16,6 +16,7 @@ from match.views import CurrentMatchView
 from match.views import MatchView
 from match.views import MultipleMatchesView
 from match.views import MyMatchesView
+from match.views import UserMatchesView
 from person.views import AuthenticateView
 from person.views import BlockUserView
 from person.views import MassMessageView
@@ -39,9 +40,9 @@ urlpatterns = [
     path("me/", MeView.as_view(), name="me"),
     path("users/", UsersView.as_view(), name="users"),
     path("users/<int:id>/", UserView.as_view(), name="user"),
-    path("users/<int:id>/matches/", AllMatchesView.as_view(), name="user_matches"),
     path("users/<int:id>/block/", BlockUserView.as_view(), name="block_user"),
     path("users/<int:id>/unblock/", UnblockUserView.as_view(), name="unblock_user"),
+    path("users/<int:id>/matches/", UserMatchesView.as_view(), name="user_matches"),
     # Push Notification URLs
     path("users/<int:id>/message/", SendMessageView.as_view(), name="user_messages"),
     path("mass-message/", MassMessageView.as_view(), name="user_messages"),

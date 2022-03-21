@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django_celery_beat.models import CrontabSchedule
 from django_celery_beat.models import PeriodicTask
+from main import main
 from match import match_status
 from match.controllers.create_match_controller import CreateMatchController
 from match.models import Match
