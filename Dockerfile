@@ -4,10 +4,10 @@ RUN apt-get update && pip3 install --upgrade pip
 RUN apt-get -q update && apt-get -qy install netcat
 
 RUN mkdir -p /usr/src/app
-RUN mkdir -p /usr/src/pear-algorithm
+RUN mkdir -p /usr/src/app/pear_algorithm
 
-# Setup submodule code
-WORKDIR /usr/src/pear-algorithm
+# # Setup submodule code
+WORKDIR /usr/src/app/pear_algorithm
 
 COPY /src/pear_algorithm/ .
 
