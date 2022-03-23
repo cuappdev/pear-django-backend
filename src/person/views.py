@@ -12,7 +12,6 @@ from .controllers.authenticate_controller import AuthenticateController
 from .controllers.search_person_controller import SearchPersonController
 from .controllers.send_message_controller import SendMessageController
 from .controllers.update_person_controller import UpdatePersonController
-from .serializers import AllMatchesSerializer
 from .serializers import AuthenticateSerializer
 from .serializers import UserSerializer
 from .simple_serializers import SimpleUserSerializer
@@ -80,17 +79,6 @@ class UsersView(generics.GenericAPIView):
         return SearchPersonController(request.GET, self.serializer_class).process()
 
 
-class AllMatchesView(generics.GenericAPIView):
-    serializer_class = AllMatchesSerializer
-
-    def get(self, request, id):
-        """Get all matches for user by user id."""
-        user = User.objects.filter(id=id)
-        if not user:
-            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
-        return success_response(self.serializer_class(user[0]).data, status.HTTP_200_OK)
-
-
 class SendMessageView(generics.GenericAPIView):
     permission_classes = api_settings.CONSUMER_PERMISSIONS
 
@@ -105,3 +93,43 @@ class MassMessageView(generics.GenericAPIView):
     def post(self, request):
         """Send custom push notification to multiple users by id."""
         return MassMessageController(request.data).process()
+
+
+class BlockUserView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def post(self, request, id):
+        """Block user by id."""
+        if not User.objects.filter(id=id).exists():
+            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        if request.user.person.blocked_users.filter(id=id).exists():
+            # User is already blocked
+            return success_response(status=status.HTTP_200_OK)
+        elif request.user.id == id:
+            return failure_response(
+                "You cannot block yourself.", status.HTTP_403_FORBIDDEN
+            )
+        else:
+            request.user.person.blocked_users.add(id)
+            return success_response(status=status.HTTP_201_CREATED)
+
+
+class UnblockUserView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def post(self, request, id):
+        """Unblock user by id."""
+        if not User.objects.filter(id=id).exists():
+            return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
+        elif id == request.user.id:
+            return failure_response(
+                "You cannot unblock yourself.", status.HTTP_403_FORBIDDEN
+            )
+        elif request.user.person.blocked_users.filter(id=id).exists():
+            request.user.person.blocked_users.remove(id)
+            return success_response(status=status.HTTP_201_CREATED)
+        else:
+            # User is not blocked anyways
+            return success_response(status=status.HTTP_200_OK)

@@ -1,3 +1,4 @@
+from datetime import datetime
 from datetime import timedelta
 import json
 
@@ -5,7 +6,6 @@ from api.utils import failure_response
 from api.utils import modify_attribute
 from api.utils import success_response
 from api.utils import update_many_to_many_set
-from django.utils import timezone
 from group.models import Group
 from interest.models import Interest
 from location.models import Location
@@ -49,7 +49,6 @@ class UpdatePersonController:
         deleted = self._data.get("deleted")
         fcm_registration_token = self._data.get("fcm_registration_token")
         is_paused = self._data.get("is_paused")
-        pause_expiration = self._data.get("pause_expiration")
         pause_weeks = self._data.get("pause_weeks")
 
         many_to_many_sets = [
@@ -65,14 +64,14 @@ class UpdatePersonController:
             if possible_error is not None:
                 return possible_error
 
-        if not is_paused:
+        if is_paused is False:
             self._person.pause_expiration = None
             pause_weeks = None
 
         if pause_weeks is not None:
             if pause_weeks != 0:
                 days = pause_weeks * 6
-                pause_expiration = timezone.now() + timedelta(days=days)
+                self._person.pause_expiration = datetime.now() + timedelta(days=days)
 
         if profile_pic_base64 is not None:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)
@@ -126,7 +125,6 @@ class UpdatePersonController:
         modify_attribute(self._person, "profile_pic_url", profile_pic_url)
         modify_attribute(self._person, "soft_deleted", deleted)
         modify_attribute(self._person, "is_paused", is_paused)
-        modify_attribute(self._person, "pause_expiration", pause_expiration)
         modify_attribute(self._person, "pending_feedback", pending_feedback)
         self._user.save()
         self._person.save()
