@@ -32,8 +32,8 @@ def update_paused_users():
 
 
 schedule, _ = IntervalSchedule.objects.get_or_create(
-    every=5,
-    period=IntervalSchedule.SECONDS,
+    every=12,
+    period=IntervalSchedule.HOURS,
 )
 PeriodicTask.objects.get_or_create(
     interval=schedule,
