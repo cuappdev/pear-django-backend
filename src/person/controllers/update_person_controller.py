@@ -1,9 +1,11 @@
+from datetime import timedelta
 import json
 
 from api.utils import failure_response
 from api.utils import modify_attribute
 from api.utils import success_response
 from api.utils import update_many_to_many_set
+from django.utils import timezone
 from group.models import Group
 from interest.models import Interest
 from location.models import Location
@@ -14,8 +16,6 @@ from push_notifications.models import GCMDevice
 from rest_framework import status
 
 from ..tasks import upload_profile_pic
-
-from datetime import timedelta, datetime
 
 
 class UpdatePersonController:
@@ -66,14 +66,13 @@ class UpdatePersonController:
                 return possible_error
 
         if not is_paused:
-                self._person.pause_expiration = None
-                pause_weeks = None
+            self._person.pause_expiration = None
+            pause_weeks = None
 
         if pause_weeks is not None:
             if pause_weeks != 0:
                 days = pause_weeks * 6
-                pause_expiration = datetime.now() + timedelta(days=days)
-                
+                pause_expiration = timezone.now() + timedelta(days=days)
 
         if profile_pic_base64 is not None:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)
