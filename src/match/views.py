@@ -200,6 +200,11 @@ class AlgorithmView(generics.GenericAPIView):
     def get(self, request):
         """Run algorithm and return matches."""
         return success_response(
-            data=pear_algorithm(User.objects.filter(person__has_onboarded=True)),
+            data=pear_algorithm(
+                User.objects.filter(
+                    person__has_onboarded=True,
+                    person__is_paused=False,
+                )
+            ),
             status=status.HTTP_201_CREATED,
         )
