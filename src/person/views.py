@@ -59,7 +59,7 @@ class MeView(generics.GenericAPIView):
 
 
 class UserView(generics.GenericAPIView):
-    serializer_class = UserSerializer
+    serializer_class = SimpleUserSerializer
     permission_classes = api_settings.CONSUMER_PERMISSIONS
 
     def get(self, request, id):
@@ -67,7 +67,11 @@ class UserView(generics.GenericAPIView):
         user = User.objects.filter(id=id)
         if not user:
             return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
-        return success_response(self.serializer_class(user[0]).data, status.HTTP_200_OK)
+        serialized_user = self.serializer_class(
+            user[0], context={"request_user": request.user}
+        )
+        # because we pass in the request, must make sure serializer is valid
+        return success_response(serialized_user.data, status.HTTP_200_OK)
 
 
 class UsersView(generics.GenericAPIView):
