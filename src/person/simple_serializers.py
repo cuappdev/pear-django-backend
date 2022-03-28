@@ -24,7 +24,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
 
     def get_blocked(self, user):
         request_user = self.context.get("request_user")
-        if request_user is not None:
+        if request_user is not None and hasattr(request_user, "person"):
             return user.id in request_user.person.blocked_users.values_list(
                 "id", flat=True
             )

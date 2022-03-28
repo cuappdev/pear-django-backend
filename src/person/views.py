@@ -80,7 +80,7 @@ class UsersView(generics.GenericAPIView):
 
     def get(self, request):
         """Get users requested with search query."""
-        return SearchPersonController(request.GET, self.serializer_class).process()
+        return SearchPersonController(request, self.serializer_class).process()
 
 
 class SendMessageView(generics.GenericAPIView):
