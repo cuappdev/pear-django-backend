@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import timedelta
 import os
 
 from celery import shared_task
@@ -35,8 +37,24 @@ schedule, _ = IntervalSchedule.objects.get_or_create(
     every=12,
     period=IntervalSchedule.HOURS,
 )
+
 PeriodicTask.objects.get_or_create(
     interval=schedule,
     name="Pause Pear Updater",
     task="person.tasks.update_paused_users",
+)
+
+
+@shared_task
+def update_inactive_users():
+    three_weeks_ago = datetime.now() - timedelta(days=21)
+    inactive_users = Person.objects.filter(last_active__lt=three_weeks_ago)
+    inactive_users.update(is_paused=True, pause_expiration=None)
+    return f"Unpaused {len(inactive_users)} inactive users"
+
+
+PeriodicTask.objects.get_or_create(
+    interval=schedule,
+    name="Inactive User Updater",
+    task="person.tasks.update_inactive_users",
 )

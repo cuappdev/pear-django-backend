@@ -73,6 +73,8 @@ class UpdatePersonController:
                 days = pause_weeks * 6
                 self._person.pause_expiration = datetime.now() + timedelta(days=days)
 
+        self._person.last_active = datetime.now()
+
         if profile_pic_base64 is not None:
             upload_profile_pic.delay(self._user.id, profile_pic_base64)
 

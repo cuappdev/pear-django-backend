@@ -38,3 +38,4 @@ class Person(models.Model):
     )
     is_paused = models.BooleanField(default=False, null=True)
     pause_expiration = models.DateTimeField(default=None, null=True)
+    last_active = models.DateTimeField(default=None, null=True)
