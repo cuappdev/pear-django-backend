@@ -9,6 +9,7 @@ from match import match_status
 from match.models import Match
 from match.serializers import BothUsersMatchSerializer
 from match.serializers import MatchSerializer
+from pear_algorithm.src.main import main as pear_algorithm
 from rest_framework import generics
 from rest_framework import status
 
@@ -194,3 +195,19 @@ class CancelCurrentMatchView(generics.GenericAPIView):
         match.status = match_status.CANCELED
         match.save()
         return success_response()
+
+
+class AlgorithmView(generics.GenericAPIView):
+    permission_classes = api_settings.ADMIN_PERMISSIONS
+
+    def get(self, request):
+        """Run algorithm and return matches."""
+        return success_response(
+            data=pear_algorithm(
+                User.objects.filter(
+                    person__has_onboarded=True,
+                    person__is_paused=False,
+                )
+            ),
+            status=status.HTTP_201_CREATED,
+        )
