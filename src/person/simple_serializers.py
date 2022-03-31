@@ -20,7 +20,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
     groups = GroupSerializer(source="person.groups", many=True)
     prompts = serializers.SerializerMethodField("get_prompts")
     pending_feedback = serializers.BooleanField(source="person.pending_feedback")
-    blocked = serializers.SerializerMethodField("get_blocked")
+    is_blocked = serializers.SerializerMethodField("get_blocked")
 
     def get_blocked(self, user):
         request_user = self.context.get("request_user")
@@ -66,6 +66,6 @@ class SimpleUserSerializer(serializers.ModelSerializer):
             "groups",
             "prompts",
             "pending_feedback",
-            "blocked",
+            "is_blocked",
         )
         read_only_fields = fields
