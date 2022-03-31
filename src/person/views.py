@@ -64,11 +64,10 @@ class UserView(generics.GenericAPIView):
 
     def get(self, request, id):
         """Get user by id."""
-        user = User.objects.filter(id=id)
-        if not user:
+        if not User.objects.filter(id=id).exists():
             return failure_response("User not found.", status.HTTP_404_NOT_FOUND)
         serialized_user = self.serializer_class(
-            user[0], context={"request_user": request.user}
+            User.objects.get(id=id), context={"request_user": request.user}
         )
         # because we pass in the request, must make sure serializer is valid
         return success_response(serialized_user.data, status.HTTP_200_OK)
