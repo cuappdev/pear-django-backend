@@ -54,6 +54,7 @@ class UserSerializer(serializers.ModelSerializer):
     blocked_users = SerializerMethodField("get_blocked_users")
     is_paused = serializers.BooleanField(source="person.is_paused")
     pause_expiration = serializers.DateTimeField(source="person.pause_expiration")
+    last_active = serializers.DateTimeField(source="person.last_active")
 
     def get_availability(self, user):
         if user.person.availability is None:
@@ -124,5 +125,6 @@ class UserSerializer(serializers.ModelSerializer):
             "blocked_users",
             "is_paused",
             "pause_expiration",
+            "last_active",
         )
         read_only_fields = fields

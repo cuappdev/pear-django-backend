@@ -19,6 +19,16 @@ class SimpleUserSerializer(serializers.ModelSerializer):
     interests = InterestSerializer(source="person.interests", many=True)
     groups = GroupSerializer(source="person.groups", many=True)
     prompts = serializers.SerializerMethodField("get_prompts")
+    pending_feedback = serializers.BooleanField(source="person.pending_feedback")
+    is_blocked = serializers.SerializerMethodField("get_blocked")
+
+    def get_blocked(self, user):
+        request_user = self.context.get("request_user")
+        if request_user is not None and hasattr(request_user, "person"):
+            return user.id in request_user.person.blocked_users.values_list(
+                "id", flat=True
+            )
+        return None
 
     def get_prompts(self, user):
         prompt_questions = user.person.prompt_questions.all()
@@ -55,5 +65,7 @@ class SimpleUserSerializer(serializers.ModelSerializer):
             "interests",
             "groups",
             "prompts",
+            "pending_feedback",
+            "is_blocked",
         )
         read_only_fields = fields
