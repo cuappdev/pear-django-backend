@@ -17,7 +17,7 @@ class SearchPersonController:
         users = User.objects.filter(
             Q(person__has_onboarded=True) & Q(person__soft_deleted=False)
         )
-        query = self._data.get("query")
+        query = self._request.GET.get("query")
         # Check if query was provided and isn't whitespace
         if query is not None and query.strip() != "":
             # Create processor to ignore query but convert User object into string choice
