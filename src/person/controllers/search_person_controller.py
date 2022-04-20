@@ -8,8 +8,9 @@ from rest_framework import status
 
 
 class SearchPersonController:
-    def __init__(self, data, serializer):
-        self._data = data
+    def __init__(self, request, serializer):
+        self._request = request
+        self._data = request.data
         self._serializer = serializer
 
     def process(self):
@@ -42,5 +43,8 @@ class SearchPersonController:
             except:
                 return failure_response("Page not found", status.HTTP_404_NOT_FOUND)
         return success_response(
-            self._serializer(users, many=True).data, status.HTTP_200_OK
+            self._serializer(
+                users, context={"request_user": self._request.user}, many=True
+            ).data,
+            status.HTTP_200_OK,
         )

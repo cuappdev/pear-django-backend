@@ -1,12 +1,13 @@
 from celery import shared_task
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django_celery_beat.models import CrontabSchedule
-from django_celery_beat.models import PeriodicTask
 from match import match_status
 from match.controllers.create_match_controller import CreateMatchController
 from match.models import Match
 from pear_algorithm.src.main import main as pear_algorithm
+
+# from django_celery_beat.models import CrontabSchedule
+# from django_celery_beat.models import PeriodicTask
 
 
 @shared_task
@@ -32,16 +33,13 @@ def matcher():
             print(f"Match error between {pear}: {error_msg}")
 
 
-schedule, _ = CrontabSchedule.objects.get_or_create(
-    minute="3",
-    hour="18",
-    day_of_week="6",
-    day_of_month="*",
-    month_of_year="*",
-)
+# Commented out until we confirm the algorithm works on an endpoint
+# schedule, _ = CrontabSchedule.objects.get_or_create(
+#     minute="00", hour="16", day_of_week="7"
+# )
 
-PeriodicTask.objects.get_or_create(
-    crontab=schedule,
-    name="Matching Algorithm 3",
-    task="match.tasks.matcher",
-)
+# PeriodicTask.objects.get_or_create(
+#     crontab=schedule,
+#     name="Matching Algorithm",
+#     task="match.tasks.matcher",
+# )

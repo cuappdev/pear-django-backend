@@ -9,6 +9,7 @@ from location.views import LocationsView
 from location.views import LocationView
 from major.views import MajorsView
 from major.views import MajorView
+from match.views import AlgorithmView
 from match.views import AllMatchesView
 from match.views import CancelCurrentMatchView
 from match.views import CancelMatchView
@@ -65,6 +66,7 @@ urlpatterns = [
     path("purposes/<int:id>/", PurposeView.as_view(), name="purpose"),
     # Match URLs
     path("matches/", MyMatchesView.as_view(), name="matches"),
+    path("matches/algorithm/", AlgorithmView.as_view(), name="algorithm"),
     path("matches/all/", AllMatchesView.as_view(), name="all_matches"),
     path("matches/multiple/", MultipleMatchesView.as_view(), name="multiple_matches"),
     path("matches/<int:id>/", MatchView.as_view(), name="match"),
