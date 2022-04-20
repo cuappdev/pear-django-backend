@@ -17,7 +17,7 @@ class SearchPersonController:
         users = User.objects.filter(
             Q(person__has_onboarded=True) & Q(person__soft_deleted=False)
         )
-        query = self._data.get("query")
+        query = self._request.GET.get("query")
         # Check if query was provided and isn't whitespace
         if query is not None and query.strip() != "":
             # Create processor to ignore query but convert User object into string choice
@@ -33,8 +33,8 @@ class SearchPersonController:
             # Extract the users from the returned tuple list
             users = list(map(lambda searched_user: searched_user[0], searched_users))
 
-        page_size = self._data.get("page_size")
-        page_number = self._data.get("page_number")
+        page_size = self._request.GET.get("page_size")
+        page_number = self._request.GET.get("page_number")
         if page_size is not None and page_number is not None:
             paginator = Paginator(users, page_size)
             try:
