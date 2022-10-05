@@ -11,19 +11,21 @@ services:
     restart: always
 
   app:
-    build: .
+    image: cornellappdev/pear-django:${IMAGE_TAG}
+    hostname: app
     env_file: .env
     command: sh -c "python manage.py makemigrations && python manage.py migrate && gunicorn pear.wsgi -b 0.0.0.0:8000"
-    container_name: app
     depends_on:
       - redis
-    expose:
-      - "8000"
-    hostname: app
-    image: app-image
     networks:
       - main
     restart: on-failure
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 8000:8000
 
   celery_worker:
     image: cornellappdev/pear-django:${IMAGE_TAG}

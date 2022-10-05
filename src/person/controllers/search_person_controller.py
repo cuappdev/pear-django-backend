@@ -8,15 +8,16 @@ from rest_framework import status
 
 
 class SearchPersonController:
-    def __init__(self, data, serializer):
-        self._data = data
+    def __init__(self, request, serializer):
+        self._request = request
+        self._data = request.data
         self._serializer = serializer
 
     def process(self):
         users = User.objects.filter(
             Q(person__has_onboarded=True) & Q(person__soft_deleted=False)
         )
-        query = self._data.get("query")
+        query = self._request.GET.get("query")
         # Check if query was provided and isn't whitespace
         if query is not None and query.strip() != "":
             # Create processor to ignore query but convert User object into string choice
@@ -32,8 +33,8 @@ class SearchPersonController:
             # Extract the users from the returned tuple list
             users = list(map(lambda searched_user: searched_user[0], searched_users))
 
-        page_size = self._data.get("page_size")
-        page_number = self._data.get("page_number")
+        page_size = self._request.GET.get("page_size")
+        page_number = self._request.GET.get("page_number")
         if page_size is not None and page_number is not None:
             paginator = Paginator(users, page_size)
             try:
@@ -42,5 +43,8 @@ class SearchPersonController:
             except:
                 return failure_response("Page not found", status.HTTP_404_NOT_FOUND)
         return success_response(
-            self._serializer(users, many=True).data, status.HTTP_200_OK
+            self._serializer(
+                users, context={"request_user": self._request.user}, many=True
+            ).data,
+            status.HTTP_200_OK,
         )
