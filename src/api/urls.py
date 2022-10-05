@@ -40,7 +40,7 @@ urlpatterns = [
     # User URLs
     path("authenticate/", AuthenticateView.as_view(), name="authenticate"),
     path("me/", MeView.as_view(), name="me"),
-    path("me/ping", PingView.as_view(), name="ping"),
+    path("me/ping/", PingView.as_view(), name="ping"),
     path("users/", UsersView.as_view(), name="users"),
     path("users/<int:id>/", UserView.as_view(), name="user"),
     path("users/<int:id>/block/", BlockUserView.as_view(), name="block_user"),
