@@ -26,8 +26,10 @@ class PearTestCase(TestCase):
             "given_name": first_name,
             "family_name": last_name,
             "email": email,
+            "has_onboarded": True,
         }
         response = self.client.post(self.AUTHENTICATE_URL, data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
+
         token = json.loads(response.content)["data"]["access_token"]
         return token
