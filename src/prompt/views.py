@@ -25,10 +25,6 @@ class PromptsView(generics.GenericAPIView):
 
     def post(self, request):
         """Create a prompt."""
-        # try:
-        #     data = json.loads(request.body)
-        # except json.JSONDecodeError:
-        #     data = request.data
         return CreatePromptController(json.loads(request.body), self.serializer_class).process()
 
 

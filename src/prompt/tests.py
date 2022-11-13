@@ -15,150 +15,121 @@ class PromptTestCase(APITestCase):
         pear_test_case.setUp()
         self.user_token = pear_test_case._create_user_and_login()
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.user_token)
+        self.populate()
 
     def populate(self):
-        """populates the database"""
+        """Populates the database"""
+
         url = reverse("populate")
+
         return self.client.post(url, {"filenames": ["pear_prompts.txt"]}, format='json')
 
-    def test_populate_prompts(self):
-        """tests that the code populates the 27 prompts in pear_prompts.txt"""
+    def assert_helper(self, response, status_code, success, fields):
+        """Asserts contents of response are accurate"""
+
+        content = json.loads(response.content)
+
+        if success:
+            self.assertTrue(content.get("success"))
+        else:
+            self.assertFalse(content.get("success"))
+        self.assertEqual(response.status_code, status_code)
+        if fields:
+            data = content.get("data")
+            self.assertIn("id", data)
+            self.assertIn("question_name", data)
+            self.assertIn("question_placeholder", data)
+
+    def prompt_response(self, arg, type, data=None):
+        """Generates the response for any tests on a specific prompt"""
+
+        url = reverse("prompt", args=[arg])
+
+        if type == "get":
+            return self.client.get(url, format='json')
+        elif type == "post":
+            return self.client.post(url, data, format='json')
+        else:
+            return self.client.delete(url, format='json')
+
+    def prompts_response(self, type, data=None):
+        """Generates the response for any tests on many prompts"""
+
+        url = reverse("prompts")
+
+        if type == "get":
+            return self.client.get(url, format='json')
+        else:
+            return self.client.post(url, data, format='json')
+
+    def test_repopulate_prompts(self):
+        """Tests that the code repopulates prompts in pear_prompts.txt"""
 
         response = self.populate()
-        content = json.loads(response.content)
-        self.assertTrue(content.get("success"))
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(Prompt.objects.count(), 27)
 
-    def test_repopulate(self):
-        """test repopulate"""
+        self.assert_helper(response, 200, True, False)
+        self.assertTrue(Prompt.objects.count() > 0)
 
     def test_get_all_prompts(self):
-        """tests getting all the promts"""
-        populate = self.populate()
+        """Tests getting all the prompts"""
 
-        url = reverse("prompts")
-        response = self.client.get(url, format='json')
-        content = json.loads(response.content)
-        self.assertTrue(content.get("success"))
-        self.assertEqual(response.status_code, 200)
+        self.assert_helper(self.prompts_response("get"), 200, True, False)
 
     def test_get_prompt_by_id(self):
-        """tests getting a promt by a valid id"""
-        poulate = self.populate()
+        """Tests getting a prompt by a valid id"""
 
-        url = reverse("prompt", args=[1])
-        response = self.client.get(url, format='json')
-        content = json.loads(response.content)
-        self.assertTrue(content.get("success"))
-        self.assertEqual(response.status_code, 200)
-        data = content.get("data")
-        self.assertIn("id", data)
-        self.assertIn("question_name", data)
-        self.assertIn("question_placeholder", data)
+        self.assert_helper(self.prompt_response(1, "get"), 200, True, True)
 
     def test_get_invalid_prompt(self):
-        """tests getting an invalid prompt"""
-        poulate = self.populate()
+        """Tests getting an invalid prompt"""
 
-        url = reverse("prompt", args=[1000])
-        response = self.client.get(url, format='json')
-        content = json.loads(response.content)
-        self.assertFalse(content.get("sucess"))
-        self.assertEqual(response.status_code, 404)
+        self.assert_helper(self.prompt_response(1000, "get"), 404, False, False)
 
     def test_create_prompt(self):
-        """tests creating a valid prompt"""
-        poulate = self.populate()
-        url = reverse("prompts")
+        """Tests creating a valid prompt"""
 
         data = {"question_name": "My favorite animal is ...",
                 "question_placeholder": "I really like the animal ..."}
-        response = self.client.post(url, data, format='json')
-        content = json.loads(response.content)
-        self.assertTrue(content.get("success"))
-        self.assertEqual(response.status_code, 201)
-        data = content.get("data")
-        self.assertIn("id", data)
-        self.assertIn("question_name", data)
-        self.assertIn("question_placeholder", data)
+
+        self.assert_helper(self.prompts_response("post", data), 201, True, True)
 
     def test_create_invalid_prompt(self):
-        """tests creating an invalid prompt"""
-        poulate = self.populate()
+        """Tests creating an invalid prompt"""
 
-        url = reverse("prompts")
         data = {"question": "some question"}
-        response = self.client.post(url, data, format='json')
-        content = json.loads(response.content)
-        self.assertFalse(content.get("success"))
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("error", content)
+
+        self.assert_helper(self.prompts_response("post", data), 400, False, False)
 
     def test_create_existing_prompt(self):
-        """tests creating already existing prompt"""
-        poulate = self.populate()
-        url = reverse("prompts")
+        """Tests creating already existing prompt"""
 
         data = {"question_name": "Why are you on Pear?",
                 "question_placeholder": "I'm on Pear because..."}
-        response = self.client.post(url, data, format='json')
-        content = json.loads(response.content)
-        self.assertTrue(content.get("success"))
-        data = content.get("data")
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("id", data)
-        self.assertIn("question_name", data)
-        self.assertIn("question_placeholder", data)
+
+        self.assert_helper(self.prompts_response("post", data), 200, True, True)
 
     def test_update_prompt(self):
-        """tests updating a valid prompt """
-        poulate = self.populate()
-        url = reverse("prompt", args=[1])
+        """Tests updating a valid prompt"""
 
         data = {"question_name": "Why are you on Pear?",
                 "question_placeholder": "I am on Pear ..... "}
-        response = self.client.post(url, data, format='json')
-        content = json.loads(response.content)
-        self.assertTrue(content.get("success"))
-        self.assertEqual(response.status_code, 200)
-        data = content.get("data")
-        self.assertIn("id", data)
-        self.assertIn("question_name", data)
-        self.assertIn("question_placeholder", data)
+
+        self.assert_helper(self.prompt_response(1, "post", data), 200, True, True)
 
     def test_update_invalid_prompt(self):
-        """tests updating invalid prompt"""
-        poulate = self.populate()
-        url = reverse("prompt", args=[100])
+        """Tests updating invalid prompt"""
 
         data = {"question_name": "anything",
                 "question_placeholder": "anything"}
-        response = self.client.post(url, data, format='json')
-        content = json.loads(response.content)
-        self.assertFalse(content.get("success"))
-        self.assertEqual(response.status_code, 404)
+
+        self.assert_helper(self.prompt_response(100, "post", data), 404, False, False)
 
     def test_delete_prompt(self):
-        """tests deleting a valid prompt"""
-        poulate = self.populate()
-        url = reverse("prompt", args=[1])
+        """Tests deleting a valid prompt"""
 
-        response = self.client.delete(url, format='json')
-        content = json.loads(response.content)
-        self.assertTrue(content.get("success"))
-        self.assertEqual(response.status_code, 200)
-        data = content.get("data")
-        self.assertIn("id", data)
-        self.assertIn("question_name", data)
-        self.assertIn("question_placeholder", data)
+        self.assert_helper(self.prompt_response(1, "delete"), 200, True, True)
 
     def test_delete_invalid_prompt(self):
-        """tests deleting an invalid prompt"""
-        poulate = self.populate()
-        url = reverse("prompt", args=[100])
+        """Tests deleting an invalid prompt"""
 
-        response = self.client.delete(url, format='json')
-        content = json.loads(response.content)
-        self.assertFalse(content.get("success"))
-        self.assertEqual(response.status_code, 404)
+        self.assert_helper(self.prompt_response(100, "delete"), 404, False, False)
