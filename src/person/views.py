@@ -9,6 +9,7 @@ from rest_framework import generics
 from rest_framework import status
 
 from .controllers.authenticate_controller import AuthenticateController
+from .controllers.ping_person_controller import PingPersonController
 from .controllers.search_person_controller import SearchPersonController
 from .controllers.send_message_controller import SendMessageController
 from .controllers.update_person_controller import UpdatePersonController
@@ -56,6 +57,25 @@ class MeView(generics.GenericAPIView):
         return UpdatePersonController(
             request.user, data, self.serializer_class
         ).process()
+
+
+class PingView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = api_settings.CONSUMER_PERMISSIONS
+
+    def get(self, request):
+        """Get current authenticated user."""
+        return success_response(
+            self.serializer_class(request.user).data, status.HTTP_200_OK
+        )
+
+    def post(self, request):
+        """Update current authenticated user."""
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            data = request.data
+        return PingPersonController(request.user, data, self.serializer_class).process()
 
 
 class UserView(generics.GenericAPIView):
