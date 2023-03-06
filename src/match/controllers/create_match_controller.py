@@ -72,6 +72,8 @@ class CreateMatchController:
         match.save()
         user_1.person.pending_feedback = True
         user_2.person.pending_feedback = True
+        user_1.person.save()
+        user_2.person.save()
         return (
             (True, "")
             if self._return_status
