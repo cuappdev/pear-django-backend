@@ -4,7 +4,6 @@ from api.utils import failure_response
 from api.utils import modify_attribute
 from api.utils import success_response
 from match import match_status
-from match.models import Match
 from rest_framework import status
 from survey import constants
 from survey.models import Survey
@@ -62,11 +61,28 @@ class CreateSurveyController:
                     status.HTTP_400_BAD_REQUEST,
                 )
 
+        # Commenting this out because iOS is sending the new match_id as the match_id,
+        # but we need the previous week's match id, which we can actually get the
+        # user's previous match using their match history. Not the most efficient, but
+        # a temporary fix.
+        #
         # Verify that required ids are valid
-        completed_match = Match.objects.filter(id=self._match_id)
-        if not completed_match:
-            return failure_response("match_id is invalid", status.HTTP_404_NOT_FOUND)
-        completed_match = completed_match[0]
+        # completed_match = Match.objects.filter(id=self._match_id)
+        # if not completed_match:
+        #     return failure_response("match_id is invalid", status.HTTP_404_NOT_FOUND)
+        # completed_match = completed_match[0]
+
+        prev_matches = (
+            self._request.user.matches_1.all() | self._request.user.matches_1.all()
+        ).order_by("-created_date")
+
+        if len(prev_matches) < 2:
+            return failure_response(
+                "User does not have enough matches", status.HTTP_400_BAD_REQUEST
+            )
+
+        # index 0 -> current match, 1 -> previous week, etc
+        completed_match = prev_matches[1]
 
         # Check if the submitting user has already submitted a survey
         survey = Survey.objects.filter(
