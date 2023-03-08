@@ -25,11 +25,7 @@ class PromptsView(generics.GenericAPIView):
 
     def post(self, request):
         """Create a prompt."""
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            data = request.data
-        return CreatePromptController(data, self.serializer_class).process()
+        return CreatePromptController(json.loads(request.body), self.serializer_class).process()
 
 
 class PromptView(generics.GenericAPIView):
@@ -47,10 +43,7 @@ class PromptView(generics.GenericAPIView):
 
     def post(self, request, id):
         """Update prompt by id."""
-        try:
-            data = json.loads(request.body)
-        except json.JSONDecodeError:
-            data = request.data
+        data = json.loads(request.body)
         return UpdatePromptController(id, data, self.serializer_class).process()
 
     def delete(self, request, id):
